@@ -1,28 +1,33 @@
 #!/bin/bash
 
 echo
-echo '******************************'
-echo ' pdf.js - cloud tests'
-echo '******************************'
+echo '*************************************'
+echo ' Generating refs from pushed repo'
+echo '*************************************'
 echo
 
-# All pushes go into ~/pushed. Make sure dir exists
-mkdir ~/pushed 2>/dev/null
+DEST=~/tmp
 
+# All pushes go into $DEST. Make sure dir exists
+mkdir -p $DEST
+
+# Parse commit SHA from stdin (passed by Git)
+# Format: <oldrev> <newrev> <refname>
+# Example: aa453216d1b3e49e7f6f98441fa56946ddcd6a20 68f7abf4e6f922807889f52bc043ecd31b79f814 refs/heads/master
+# (we want <newrev>)
 COMMIT=$(sed 's/\([a-f0-9]*\) \([a-f0-9]*\).*/\2/' < /dev/stdin)
 
 echo
 echo '*** [post-receive] creating directory for commit'
 echo
-cd ~/pushed; rm -rf $COMMIT 2>/dev/null; git clone ~/pdf.js $COMMIT
+cd $DEST; rm -rf $COMMIT 2>/dev/null; git clone ~/pdf.js-refs $COMMIT
 
 echo
 echo '*** [post-receive] running tests'
 echo
-cd ~/pushed/$COMMIT
-make test
+cd $DEST/$COMMIT
+make master
 
 echo
 echo '*** [post-receive] all done.'
 echo
-

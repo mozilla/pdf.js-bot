@@ -12,7 +12,7 @@ var request = require('request'),
 
 // Constants
 var GITHUB_CREDENTIALS = process.env.GITHUB_CREDENTIALS; // Github credentials, format 'user:password123'
-var BOT_COMMAND = new RegExp('@pdfjsbot (\\w+)'); // if this string is found in pull request comments, the bot will be triggered
+var BOT_COMMAND = new RegExp('@pdfjsbot'); // if this string is found in pull request comments, the bot will be triggered
 var REPO = 'arturadib/pdf.js'; // format: user/repo
 var DEST_PATH = 't'; // where repos to be tested will be stored
 
@@ -45,8 +45,7 @@ request.get('https://github.com/api/v2/json/pulls/'+REPO+'/open', function(error
 
       var hasBotCommand = false,
           targetDir = DEST_PATH+'/'+sha,
-          gitProcess, commandParam,
-          t1;
+          gitProcess, t1;
 
       // 
       // Scan comments for bot command
@@ -55,7 +54,6 @@ request.get('https://github.com/api/v2/json/pulls/'+REPO+'/open', function(error
         var bodyMatches = comment.body ? comment.body.match(BOT_COMMAND) : false;
         if (comment.type === 'IssueComment' && bodyMatches) {
           hasBotCommand = true;
-          commandParam = bodyMatches[1]; // e.g. if command is 'pdfjsbot all', then param is 'all'
         }
       });
 
@@ -72,7 +70,7 @@ request.get('https://github.com/api/v2/json/pulls/'+REPO+'/open', function(error
           // Notify start of tests
           request.post({
             url:'https://'+GITHUB_CREDENTIALS+'@github.com/api/v2/json/issues/comment/'+REPO+'/'+pullBrief.number,
-            json:{comment:'Starting tests: '+commandParam}
+            json:{comment:'Starting tests... Results will be reported as a comment here.'}
           });
           
           //
@@ -96,7 +94,7 @@ request.get('https://github.com/api/v2/json/pulls/'+REPO+'/open', function(error
               // Notify end of tests
               request.post({
                 url:'https://'+GITHUB_CREDENTIALS+'@github.com/api/v2/json/issues/comment/'+REPO+'/'+pullBrief.number,
-                json:{comment:'All tests passed! Test time: '+timeInMins+' mins'}
+                json:{comment:'All tests passed. Test time: '+timeInMins+' mins'}
               });
             }
             else {
