@@ -1,6 +1,9 @@
 //
 // pdf.js tryserver bot
 //
+// This bot monitors pull requests in a given GitHub REPO for comments that match a BOT_COMMAND.
+// If there's a match, a test is launched and results are reported back to the pull request as comments.
+//
 
 // Libs
 var request = require('request'),
@@ -9,7 +12,7 @@ var request = require('request'),
 
 // Constants
 var GITHUB_CREDENTIALS = process.env.GITHUB_CREDENTIALS; // Github credentials, format 'user:password123'
-var GITHUB_COMMAND = new RegExp('pdfjsbot (\\w+)'); // if this string is found in pull request comments, the bot will be triggered
+var BOT_COMMAND = new RegExp('pdfjsbot (\\w+)'); // if this string is found in pull request comments, the bot will be triggered
 var REPO = 'arturadib/pdf.js'; // format: user/repo
 var DEST_PATH = 't'; // where repos to be tested will be stored
 
@@ -43,13 +46,13 @@ request.get('https://github.com/api/v2/json/pulls/'+REPO+'/open', function(error
       var hasBotCommand = false,
           targetDir = DEST_PATH+'/'+sha,
           gitProcess, commandParam,
-          t1, t2;
+          t1;
 
       // 
       // Scan comments for bot command
       // 
       comments.forEach(function(comment){
-        var bodyMatches = comment.body ? comment.body.match(GITHUB_COMMAND) : false;
+        var bodyMatches = comment.body ? comment.body.match(BOT_COMMAND) : false;
         if (comment.type === 'IssueComment' && bodyMatches) {
           hasBotCommand = true;
           commandParam = bodyMatches[1]; // e.g. if command is 'pdfjsbot all', then param is 'all'
@@ -63,7 +66,7 @@ request.get('https://github.com/api/v2/json/pulls/'+REPO+'/open', function(error
         //        
         console.log('[bot.js] pull #'+pull.number+': found bot command');        
         if (!path.existsSync(targetDir)) { // have we run/started the test already?
-          console.log('[bot.js] target directory clear. spawning script');          
+          console.log('[bot.js] target directory clear. spawning script...');          
           t1 = new Date();
 
           // Notify start of tests
@@ -77,7 +80,8 @@ request.get('https://github.com/api/v2/json/pulls/'+REPO+'/open', function(error
           //
           gitProcess = spawn('./fetch-repo-run-tests', [url, sha, targetDir]);
           gitProcess.on('exit', function(code){
-            t2 = new Date();
+            var t2 = new Date(),
+                timeInMins = ((t2-t1)/(1000*60)).toFixed(2);
 
             //
             // All tests done!
@@ -87,12 +91,12 @@ request.get('https://github.com/api/v2/json/pulls/'+REPO+'/open', function(error
               //
               // Tests passed
               //              
-              console.log('[bot.js] all tests passed. took '+Math.round((t2-t1)/1000 % 3600)+' mins');
+              console.log('[bot.js] all tests passed. took '+timeInMins+' mins');
                             
               // Notify end of tests
               request.post({
                 url:'https://'+GITHUB_CREDENTIALS+'@github.com/api/v2/json/issues/comment/'+REPO+'/'+pullBrief.number,
-                json:{comment:'All tests passed. Test time: '+Math.round((t2-t1)/1000 % 3600)+' mins'}
+                json:{comment:'All tests *passed*! Test time: '+timeInMins+' mins'}
               });
             }
             else {
@@ -100,12 +104,12 @@ request.get('https://github.com/api/v2/json/pulls/'+REPO+'/open', function(error
               //
               // Tests did NOT pass
               //
-              console.log('[bot.js] tests DID NOT pass. took '+Math.round((t2-t1)/1000 % 3600)+' mins');
+              console.log('[bot.js] tests DID NOT pass. took '+timeInMins+' mins');
               
               // Notify end of tests
               request.post({
                 url:'https://'+GITHUB_CREDENTIALS+'@github.com/api/v2/json/issues/comment/'+REPO+'/'+pullBrief.number,
-                json:{comment:'Tests **DID NOT** pass. Test time: '+Math.round((t2-t1)/1000 % 3600)+' mins'}
+                json:{comment:'Tests **DID NOT** pass. Test time: '+timeInMins+' mins'}
               });
             } // if !passed tests
             
