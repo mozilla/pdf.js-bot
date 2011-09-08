@@ -1,0 +1,34 @@
+#!/bin/bash
+
+if [ ! $1 -o ! $2 -o ! $3 ]; then
+  echo 'arguments: <repo_url> <sha> <target_dir>'
+  echo
+  exit
+fi
+
+URL=$1
+SHA=$2
+TARGET=$3
+SCRIPT_DIR="$( cd "$( dirname "$0" )" && pwd )"
+
+if [ -d $TARGET ]; then
+  echo 'target dir (' $TARGET ') already exists'
+  echo
+  exit
+fi
+
+#
+# Fetches specified git repo
+#
+
+mkdir -p $TARGET
+cd $TARGET
+git init; git fetch $URL; git checkout $SHA
+
+#
+# Deploy manifest files, run tests
+#
+
+cp $SCRIPT_DIR/manifests/test_manifest.json ./test
+cp $SCRIPT_DIR/manifests/browser_manifest.json ./test/resources/browser_manifests
+make test
