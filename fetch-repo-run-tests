@@ -1,40 +1,55 @@
 #!/bin/bash
 #
 # This script checks out a given sha1/commit from a specified remote repo 
-# into the desired directory, and runs regression tests into the dir.
+# to the desired directory, and runs regression tests into the dir.
 #
 # Once the tests are done, it erases everything from the directory except
-# for test/eq.log (if any; for debugging purposes).
+# for test/eq.log (if any; for debugging purposes). The directory is left
+# there as its name (a sha1) tells the bot that it has already handled that
+# commit.
 #
 
-if [ ! $1 -o ! $2 -o ! $3 ]; then
-  echo 'arguments: <repo_url> <sha> <target_dir>'
+if [ $# -ne 4 ]; then
+  echo 'arguments: <target_repo_url> <ref_repo_url> <sha> <pulls_path>'
   echo
   exit
 fi
 
-URL=$1
-SHA=$2
-TARGET=$3
+TARGET_URL=$1
+REF_URL=$2
+SHA=$3
+# Get absolute path for current dir
 SCRIPT_DIR="$( cd "$( dirname "$0" )" && pwd )"
+# Hack to get absolute path for pulls
+mkdir -p $4; cd $4
+PULLS_DIR="$( cd "$( dirname "$0" )" && pwd )"
+TARGET_DIR=$PULLS_DIR/tests/$SHA
+cd $SCRIPT_DIR
 
-if [ -d $TARGET ]; then
-  echo 'target dir (' $TARGET ') already exists'
+if [ -d $TARGET_DIR ]; then
+  echo 'target dir (' $TARGET_DIR ') already exists'
   echo
   exit
 fi
 
 #
-# Fetch specified git repo
+# Fetch git repo to be tested (target), checkout desired sha
 #
-mkdir -p $TARGET
-cd $TARGET
-git init; git fetch $URL; git checkout $SHA
+mkdir -p $TARGET_DIR
+cd $TARGET_DIR
+git init; git fetch $TARGET_URL; git checkout $SHA
+
+#
+# Pull up-to-date reference snapshots; repo should contain ref/ dir
+#
+mkdir -p $TARGET_DIR/test
+cd $TARGET_DIR/test
+git init; git pull -f $REF_URL
 
 #
 # Deploy manifest files, run tests
 #
-cd $TARGET
+cd $TARGET_DIR
 cp $SCRIPT_DIR/pdf.js-files/test_manifest.json ./test
 cp $SCRIPT_DIR/pdf.js-files/browser_manifest.json ./test/resources/browser_manifests
 make test
@@ -42,5 +57,5 @@ make test
 #
 # Erase everything but eq.log
 #
-cd $TARGET
+cd $TARGET_DIR
 find . ! -iname 'eq.log' -delete
