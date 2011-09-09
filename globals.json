@@ -1,0 +1,7 @@
+{
+  "botname": "@pdfjsbot",
+  "repo_main": "arturadib/pdf.js",
+  "repo_ref": "arturadib/pdf.js-ref",
+  "test_path": "data-test",
+  "master_path": "data-master"
+}

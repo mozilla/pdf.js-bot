@@ -19,8 +19,14 @@ These files are used at Mozilla to run the cloud regression tests for the projec
 
 ## Setting up bot server
 
-1. `git clone` bot repo to `pdf.js-bot`
-2. `export GITHUB_CREDENTIALS=pdfjsbot:<password_here>`
-3. Install `node.js` and `npm` (prefer stable binary packages if available)
-4. Run `npm install` in the root of `pdf.js-bot/`
-5. Start bot with `forever bot.js`
+1. Install `node.js` and `npm` (prefer stable binary packages if available)
+2. Run `npm install` in the root of `pdf.js-bot/`
+3. Clone repo: `git clone` to `pdf.js-bot`
+4. Configure: `export GITHUB_CREDENTIALS=pdfjsbot:<password_here>`
+5. Configure more: edit `globals.json`
+6. Start bot with `forever bot.js`
+
+The bot will generate the following directories:
+
+    data-test/              stores commits to be tested ('make test')
+    data-master/            stores commits for generating reference snapshots ('make master')

@@ -1,20 +1,19 @@
 //
 // pdf.js tryserver bot
 //
-// This bot monitors pull requests in a given GitHub REPO for comments that match a BOT_COMMAND.
+// This bot monitors pull requests in a given GitHub repo for comments that match a bot command (see globals).
 // If there's a match, a test is launched and results are reported back to the pull request as comments.
 //
 
 // Libs
 var request = require('request'),
     spawn = require('child_process').spawn,
-    path = require('path');
+    path = require('path'),
+    fs = require('fs'),
+    globals = JSON.parse( fs.readFileSync('globals.json').toString() );
 
 // Constants
 var GITHUB_CREDENTIALS = process.env.GITHUB_CREDENTIALS; // Github credentials, format 'user:password123'
-var BOT_COMMAND = new RegExp('@pdfjsbot'); // if this string is found in pull request comments, the bot will be triggered
-var REPO = 'arturadib/pdf.js'; // format: user/repo
-var DEST_PATH = 't'; // where repos to be tested will be stored
 
 if (!GITHUB_CREDENTIALS) {
   console.log('Environment variable GITHUB_CREDENTIALS not configured');
@@ -25,7 +24,7 @@ if (!GITHUB_CREDENTIALS) {
 //
 // Get all (open) pull requests for repo
 //
-request.get('https://github.com/api/v2/json/pulls/'+REPO+'/open', function(error, response, body) {
+request.get('https://github.com/api/v2/json/pulls/'+globals.repo_main+'/open', function(error, response, body) {
   var pulls = JSON.parse(body).pulls;
   console.log('[bot.js] found '+pulls.length+' open pull requests')
   pulls.forEach(function(pullBrief){
@@ -33,7 +32,7 @@ request.get('https://github.com/api/v2/json/pulls/'+REPO+'/open', function(error
     //
     // Get pull request details (incl comments)
     //
-    request.get('https://github.com/api/v2/json/pulls/'+REPO+'/'+pullBrief.number, function(error, response, body) {
+    request.get('https://github.com/api/v2/json/pulls/'+globals.repo_main+'/'+pullBrief.number, function(error, response, body) {
       
       //
       // Pull details
@@ -44,14 +43,14 @@ request.get('https://github.com/api/v2/json/pulls/'+REPO+'/open', function(error
           comments = pull.discussion;
 
       var hasBotCommand = false,
-          targetDir = DEST_PATH+'/'+sha,
+          targetDir = globals.test_path+'/'+sha,
           gitProcess, t1;
 
       // 
       // Scan comments for bot command
       // 
       comments.forEach(function(comment){
-        var bodyMatches = comment.body ? comment.body.match(BOT_COMMAND) : false;
+        var bodyMatches = comment.body ? comment.body.match(new RegExp(globals.botname)) : false;
         if (comment.type === 'IssueComment' && bodyMatches) {
           hasBotCommand = true;
         }
@@ -69,7 +68,7 @@ request.get('https://github.com/api/v2/json/pulls/'+REPO+'/open', function(error
 
           // Notify start of tests
           request.post({
-            url:'https://'+GITHUB_CREDENTIALS+'@github.com/api/v2/json/issues/comment/'+REPO+'/'+pullBrief.number,
+            url:'https://'+GITHUB_CREDENTIALS+'@github.com/api/v2/json/issues/comment/'+globals.repo_main+'/'+pullBrief.number,
             json:{comment:'Starting tests... Results will be reported as a comment here.'}
           });
           
@@ -93,7 +92,7 @@ request.get('https://github.com/api/v2/json/pulls/'+REPO+'/open', function(error
                             
               // Notify end of tests
               request.post({
-                url:'https://'+GITHUB_CREDENTIALS+'@github.com/api/v2/json/issues/comment/'+REPO+'/'+pullBrief.number,
+                url:'https://'+GITHUB_CREDENTIALS+'@github.com/api/v2/json/issues/comment/'+globals.repo_main+'/'+pullBrief.number,
                 json:{comment:'All tests passed. Test time: '+timeInMins+' mins'}
               });
             }
@@ -106,7 +105,7 @@ request.get('https://github.com/api/v2/json/pulls/'+REPO+'/open', function(error
               
               // Notify end of tests
               request.post({
-                url:'https://'+GITHUB_CREDENTIALS+'@github.com/api/v2/json/issues/comment/'+REPO+'/'+pullBrief.number,
+                url:'https://'+GITHUB_CREDENTIALS+'@github.com/api/v2/json/issues/comment/'+globals.repo_main+'/'+pullBrief.number,
                 json:{comment:'Tests **DID NOT** pass. Test time: '+timeInMins+' mins'}
               });
             } // if !passed tests

@@ -1,4 +1,11 @@
 #!/bin/bash
+#
+# This script checks out a given sha1/commit from a specified remote repo 
+# into the desired directory, and runs regression tests into the dir.
+#
+# Once the tests are done, it erases everything from the directory except
+# for test/eq.log (if any; for debugging purposes).
+#
 
 if [ ! $1 -o ! $2 -o ! $3 ]; then
   echo 'arguments: <repo_url> <sha> <target_dir>'
@@ -18,9 +25,8 @@ if [ -d $TARGET ]; then
 fi
 
 #
-# Fetches specified git repo
+# Fetch specified git repo
 #
-
 mkdir -p $TARGET
 cd $TARGET
 git init; git fetch $URL; git checkout $SHA
@@ -28,7 +34,13 @@ git init; git fetch $URL; git checkout $SHA
 #
 # Deploy manifest files, run tests
 #
-
+cd $TARGET
 cp $SCRIPT_DIR/pdf.js-files/test_manifest.json ./test
 cp $SCRIPT_DIR/pdf.js-files/browser_manifest.json ./test/resources/browser_manifests
 make test
+
+#
+# Erase everything but eq.log
+#
+cd $TARGET
+find . ! -iname 'eq.log' -delete
