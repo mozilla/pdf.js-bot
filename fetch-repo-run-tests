@@ -29,6 +29,6 @@ git init; git fetch $URL; git checkout $SHA
 # Deploy manifest files, run tests
 #
 
-cp $SCRIPT_DIR/manifests/test_manifest.json ./test
-cp $SCRIPT_DIR/manifests/browser_manifest.json ./test/resources/browser_manifests
+cp $SCRIPT_DIR/pdf.js-files/test_manifest.json ./test
+cp $SCRIPT_DIR/pdf.js-files/browser_manifest.json ./test/resources/browser_manifests
 make test

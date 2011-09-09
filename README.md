@@ -1,39 +1,26 @@
-# pdf.js-tryserver
-
-**Work in progress**
+# WORK IN PROGRESS
 
 These files are used at Mozilla to run the cloud regression tests for the project [pdf.js](https://github.com/andreasgal/pdf.js).
 
 
 ## Workflow
 
-**Users**
+**Performing regression test**
 
 1. User submits pull request to main repo
-2. Admin mentions '@pdfjsbot' if test is deemed necessary
-3. @pdfjsbot comments back with the result of tests
+2. Reviewer mentions `@pdfjsbot` if test is deemed necessary
+3. `@pdfjsbot` comments back with the results of test
 
-**Generating reference snapshots (private)**
+**Generating reference snapshots**
 
-1. Admin pushes stable repo to `pdf.js-refs`, at our git server
-2. Git server generates all reference snapshots, saves them for future tests
+1. Reviewer attaches tag `ref` to desired commit
+2. `@pdfjsbot` detects new tag position, generates snapshots, and pushes them to snapshot repo `pdf.js-ref`
 
 
+## Setting up bot server
 
-## Setting up the cloud server
-
-The root dir should have the following contents:
-
-    pdf.js-refs/                bare git repo for receiving pushes to generate refs
-    pdf.js-tryserver/           bot and etc, cloned from Github
-
-**Git server for refs (pdf.js-refs/)**
-
-1. `git init --bare` in the root dir
-2. Create symlink from `pdf.js/hooks/post-receive` to `pdf.js-tryserver/git-hooks/post-receive`
-
-**Bot (pdf.js-tryserver/)**
-
-1. Install `node` and `npm` (prefer binary packages if available)
-2. Run `npm install` in the root of `pdf.js-tryserver/`
-
+1. `git clone` bot repo to `pdf.js-bot`
+2. `export GITHUB_CREDENTIALS=pdfjsbot:<password_here>`
+3. Install `node.js` and `npm` (prefer stable binary packages if available)
+4. Run `npm install` in the root of `pdf.js-bot/`
+5. Start bot with `forever bot.js`
