@@ -1,13 +1,4 @@
 #!/bin/bash
-#
-# This script checks out a given sha1/commit from a specified remote repo 
-# to the desired directory, and runs regression tests into the dir.
-#
-# Once the tests are done, it erases everything from the directory except
-# for test/eq.log (if any; for debugging purposes). The directory is left
-# there as its name (a sha1) tells the bot that it has already handled that
-# commit.
-#
 
 if [ $# -ne 4 ]; then
   echo 'arguments: <target_repo_url> <ref_repo_url> <sha> <pulls_path>'
@@ -55,7 +46,7 @@ cp $SCRIPT_DIR/pdf.js-files/browser_manifest.json ./test/resources/browser_manif
 make test
 
 #
-# Erase everything but eq.log
+# Erase everything but eq.log; keep dir to tell bot we already processed that commit
 #
 cd $TARGET_DIR
 find . ! -iname 'eq.log' -delete
