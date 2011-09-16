@@ -1,11 +1,14 @@
 #!/bin/bash
 
 if [ $# -ne 4 ]; then
-  echo 'arguments: <target_repo_url> <ref_repo_url> <sha> <pulls_path>'
+  echo 'arguments: <repo_url> <ref_repo_url> <sha> <pulls_path>'
   echo
   exit
 fi
 
+#
+# Set up vars
+#
 TARGET_URL=$1
 REF_URL=$2
 SHA=$3
@@ -41,8 +44,9 @@ git init; git pull -f $REF_URL
 # Deploy manifest files, run tests
 #
 cd $TARGET_DIR
-cp $SCRIPT_DIR/pdf.js-files/test_manifest.json ./test
-cp $SCRIPT_DIR/pdf.js-files/browser_manifest.json ./test/resources/browser_manifests
+cp -f $SCRIPT_DIR/pdf.js-files/test_manifest.json ./test
+cp -f $SCRIPT_DIR/pdf.js-files/browser_manifest.json ./test/resources/browser_manifests
+cp -f $SCRIPT_DIR/pdf.js-files/Makefile .
 make test
 
 #

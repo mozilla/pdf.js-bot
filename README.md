@@ -1,6 +1,6 @@
-# WORK IN PROGRESS
+# pdf.js-bot
 
-These files are used at Mozilla to run the cloud regression tests for the project [pdf.js](https://github.com/andreasgal/pdf.js).
+These files are used by pdf.js reviewers to run cloud regression tests.
 
 
 ## Workflow
@@ -10,6 +10,9 @@ These files are used at Mozilla to run the cloud regression tests for the projec
 1. User submits pull request to main repo
 2. Reviewer mentions `@pdfjsbot` if test is deemed necessary
 3. `@pdfjsbot` comments back with the results of test
+
+Once mentioned in a pull request, `@pdfjsbot` will continue to check the issue for newer commits, and will fire off the tests every time a new commit is detected.
+
 
 **Generating reference snapshots**
 
@@ -25,8 +28,3 @@ These files are used at Mozilla to run the cloud regression tests for the projec
 4. Configure: `export GITHUB_CREDENTIALS=pdfjsbot:<password_here>`
 5. Configure more: edit `globals.json`
 6. Start bot with `forever bot.js`
-
-The bot will generate the following directories:
-
-    data-test/              stores commits to be tested ('make test')
-    data-master/            stores commits for generating reference snapshots ('make master')

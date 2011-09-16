@@ -102,15 +102,14 @@ var checkAndRunTests = function(){
           //        
           console.log((new Date())+': pull #'+pull.number+': found bot command');        
           if (!path.existsSync(targetDir)) { // have we run/started the test already?
-            console.log((new Date())+': target directory clear. spawning script...');          
             t1 = new Date();
 
             // Notify start of tests
             request.post({
               url:'https://'+GITHUB_CREDENTIALS+'@github.com/api/v2/json/issues/comment/'+config.main_repo+'/'+pullBrief.number,
-              json:{comment:'Starting tests... Results will be reported as a comment here.'}
+              json:{comment:'Starting tests...'}
             }, function(error, response, body){
-              if (response.statusCode !== 200) {
+              if (response.statusCode !== 201) {
                 console.log((new Date())+': error: status code = ', response.statusCode);
                 return;
               }
@@ -120,15 +119,24 @@ var checkAndRunTests = function(){
             // Fetch git repo, checkout sha1, run tests
             //
             var refUrl = 'git://github.com/'+config.ref_repo+'.git';
+            var spawnOutput = {stdout:'', stderr:''};
+            console.log((new Date())+': target directory clear. spawning script...');
+            console.log((new Date())+': running ./fetch-repo-run-tests', pullUrl, refUrl, sha, config.pulls_path);
             gitProcess = spawn('./fetch-repo-run-tests', [pullUrl, refUrl, sha, config.pulls_path]);
+            gitProcess.stdout.on('data', function(data){
+              spawnOutput.stdout += data;
+            });
+            gitProcess.stderr.on('data', function(data){
+              spawnOutput.stderr += data;
+            });
             gitProcess.on('exit', function(code){
               var t2 = new Date(),
                   timeInMins = ((t2-t1)/(1000*60)).toFixed(2);
 
               //
               // All tests done!
-              //                        
-              if (!path.existsSync(targetDir+'/test/eq.log')) {              
+              //
+              if (spawnOutput.stdout.search(/FAIL/) < 0) {
               
                 //
                 // Tests passed
@@ -138,9 +146,9 @@ var checkAndRunTests = function(){
                 // Notify end of tests
                 request.post({
                   url:'https://'+GITHUB_CREDENTIALS+'@github.com/api/v2/json/issues/comment/'+config.main_repo+'/'+pullBrief.number,
-                  json:{comment:'All tests passed. Test time: '+timeInMins+' mins'}
+                  json:{comment:'All tests passed. Test time: '+timeInMins+' mins\n\nOutput:\n\n'+spawnOutput.stdout}
                 }, function(error, response, body){
-                  if (response.statusCode !== 200) {
+                  if (response.statusCode !== 201) {
                     console.log((new Date())+': error: status code = ', response.statusCode);
                     return;
                   }
@@ -156,9 +164,9 @@ var checkAndRunTests = function(){
                 // Notify end of tests
                 request.post({
                   url:'https://'+GITHUB_CREDENTIALS+'@github.com/api/v2/json/issues/comment/'+config.main_repo+'/'+pullBrief.number,
-                  json:{comment:'Tests **DID NOT** pass. Test time: '+timeInMins+' mins'}
+                  json:{comment:'Tests **DID NOT** pass. Test time: '+timeInMins+' mins\n\nOutput:\n\n'+spawnOutput.stdout}
                 }, function(error, response, body){
-                  if (response.statusCode !== 200) {
+                  if (response.statusCode !== 201) {
                     console.log((new Date())+': error: status code = ', response.statusCode);
                     return;
                   }
