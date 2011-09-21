@@ -26,5 +26,5 @@ Once mentioned in a pull request, `@pdfjsbot` will continue to check the issue f
 2. Run `npm install` in the root of `pdf.js-bot/`
 3. Clone repo: `git clone` to `pdf.js-bot`
 4. Configure: `export GITHUB_CREDENTIALS=pdfjsbot:<password_here>`
-5. Configure more: edit `globals.json`
-6. Start bot with `forever bot.js`
+5. Configure more: edit `config.json`
+6. Start bot with `forever server.js`

@@ -2,5 +2,5 @@
   "botname": "@pdfjsbot",
   "main_repo": "arturadib/pdf.js",
   "ref_repo": "arturadib/pdf.js-ref",
-  "pulls_path": "./tmp"
+  "dest_path": "./tmp"
 }

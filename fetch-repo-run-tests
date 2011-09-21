@@ -21,9 +21,8 @@ TARGET_DIR=$PULLS_DIR/tests/$SHA
 cd $SCRIPT_DIR
 
 if [ -d $TARGET_DIR ]; then
-  echo 'target dir (' $TARGET_DIR ') already exists'
-  echo
-  exit
+  echo 'target dir (' $TARGET_DIR ') already exists - overwriting it...'
+  rm -rf $TARGET_DIR
 fi
 
 #
@@ -34,23 +33,23 @@ cd $TARGET_DIR
 git init; git fetch $TARGET_URL; git checkout $SHA
 
 #
-# Pull up-to-date reference snapshots; repo should contain ref/ dir
+# Pull up-to-date reference snapshots
 #
-mkdir -p $TARGET_DIR/test
-cd $TARGET_DIR/test
+mkdir -p $TARGET_DIR/test/ref
+cd $TARGET_DIR/test/ref
 git init; git pull -f $REF_URL
 
 #
 # Deploy manifest files, run tests
 #
 cd $TARGET_DIR
-cp -f $SCRIPT_DIR/pdf.js-files/test_manifest.json ./test
-cp -f $SCRIPT_DIR/pdf.js-files/browser_manifest.json ./test/resources/browser_manifests
-cp -f $SCRIPT_DIR/pdf.js-files/Makefile .
+cp -f $SCRIPT_DIR/test-files/test_manifest.json ./test
+cp -f $SCRIPT_DIR/test-files/browser_manifest.json ./test/resources/browser_manifests
+cp -f $SCRIPT_DIR/test-files/Makefile .
 make test
 
 #
 # Erase everything but eq.log; keep dir to tell bot we already processed that commit
 #
-cd $TARGET_DIR
-find . ! -iname 'eq.log' -delete
+# cd $TARGET_DIR
+# find . ! -iname 'eq.log' -delete
