@@ -1,7 +1,7 @@
 /**
  *
  *
- * Test scripts for bot
+ * Test script controls for bot
  *
  *
  **/
@@ -39,9 +39,8 @@ exports.runTests = function(args, callback){
     //
     // All tests done
     //
-console.log(spawnOutput.stdout);
-    if (callback) callback(spawnOutput.stdout);
-    
+    if (callback) callback(spawnOutput.stdout);    
+
   }); // gitProcess.on('exit')
 } // runTests()
 

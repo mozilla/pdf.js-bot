@@ -51,5 +51,7 @@ make test
 #
 # Erase everything but eq.log; keep dir to tell bot we already processed that commit
 #
-# cd $TARGET_DIR
-# find . ! -iname 'eq.log' -delete
+cd $TARGET_DIR
+mv -f test/eq.log .
+mv -f test/resources/reftest-analyzer.xhtml .
+find . ! -iname 'eq.log' -and ! -iname 'reftest-analyzer.xhtml' -delete

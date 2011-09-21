@@ -27,7 +27,6 @@ exports.buildWhitelist = function(callback){
       return;
     } 
     config.whitelist = JSON.parse(body).collaborators;
-    console.log((new Date())+': found '+config.whitelist.length+' whitelisted users');
     callback();
   });
 }; // buildWhitelist()
@@ -67,10 +66,7 @@ exports.forEachNewCommand = function(callback){
         // Only processes commands by whitelisted users
         //
         isWhitelisted = config.whitelist.indexOf(comment.user.login) > -1;
-        if (!isWhitelisted) {
-          console.log((new Date())+': denying request by non-whitelisted user (@'+comment.user.login+')');
-          return;
-        }
+        if (!isWhitelisted) return;
 
         if (!hasProcessedMark(comments, comment.id)) {
           if (callback) {
@@ -130,10 +126,8 @@ function forEachOpenPullReq(callback){
     if (response.statusCode !== 200) {
       console.log((new Date())+': error: status code = ', response.statusCode);
       return;
-    }
-  
+    }  
     var pulls = JSON.parse(body).pulls;
-    console.log((new Date())+': found '+pulls.length+' open pull requests')
 
     pulls.forEach(callback);  
   }); // request.get
