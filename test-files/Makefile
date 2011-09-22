@@ -33,6 +33,7 @@ browser-test:
 
 master:
 	cd test && \
-	python test.py --reftest \
+	python test.py \
 	--masterMode \
+	--noPrompts \
 	--browserManifestFile=$(PDF_BROWSERS)

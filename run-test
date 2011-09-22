@@ -1,7 +1,11 @@
 #!/bin/bash
+#
+# Clone source repo to be tested and run tests
+#
+
 
 if [ $# -ne 4 ]; then
-  echo 'arguments: <repo_url> <ref_repo_url> <sha> <pulls_path>'
+  echo 'arguments: <repo_url> <sha> <ref_repo_url> <temp_path>'
   echo
   exit
 fi
@@ -10,14 +14,14 @@ fi
 # Set up vars
 #
 TARGET_URL=$1
-REF_URL=$2
-SHA=$3
+SHA=$2
+REF_URL=$3
 # Get absolute path for current dir
 SCRIPT_DIR="$( cd "$( dirname "$0" )" && pwd )"
-# Hack to get absolute path for pulls
+# Hack to get absolute path for tmp path
 mkdir -p $4; cd $4
-PULLS_DIR="$( cd "$( dirname "$0" )" && pwd )"
-TARGET_DIR=$PULLS_DIR/tests/$SHA
+TMP_DIR="$( cd "$( dirname "$0" )" && pwd )"
+TARGET_DIR=$TMP_DIR/tests/$SHA
 cd $SCRIPT_DIR
 
 if [ -d $TARGET_DIR ]; then
@@ -33,11 +37,31 @@ cd $TARGET_DIR
 git clone $TARGET_URL .; git checkout $SHA
 
 #
-# Pull up-to-date reference snapshots
+# Pull reference snapshots
 #
 mkdir -p $TARGET_DIR/test/ref
 cd $TARGET_DIR/test/ref
 git init; git pull -f $REF_URL
+
+#
+# Check if commit/SHA used to generate snapshots is present in target history
+# (can't proceed with test if not, as it means commit/SHA has not been 
+#  merged yet)
+#
+cd $TARGET_DIR/test/ref
+ORIGINAL_SHA=`grep 'sha' REF-INFO | sed -e 's/sha \([0-9a-z]*\)/\1/g'` # get SHA from REF-INFO
+COMMIT_EXISTS=`cd $TARGET_DIR; git show $ORIGINAL_SHA --format="commit exists: %h" | grep 'commit exists'` # ask git if SHA exists in index
+# is COMMIT_EXISTS zero-length? (i.e. no match)
+if [ -z $COMMIT_EXISTS ]; then
+
+echo 'commit_exists: ' $COMMIT_EXISTS
+
+  echo
+  echo "***"
+  echo "ERROR: Cannot proceed with tests, as reference repo is out of sync with source (could not find originating commit/SHA into this pull's index)."
+  echo "Try merging the commit used to generate the current snapshots ($ORIGINAL_SHA) into this pull request."
+  exit
+fi
 
 #
 # Deploy manifest files, run tests
@@ -45,11 +69,12 @@ git init; git pull -f $REF_URL
 cd $TARGET_DIR
 cp -f $SCRIPT_DIR/test-files/test_manifest.json ./test
 cp -f $SCRIPT_DIR/test-files/browser_manifest.json ./test/resources/browser_manifests
+cp -f $SCRIPT_DIR/test-files/test.py ./test
 cp -f $SCRIPT_DIR/test-files/Makefile .
 make test
 
 #
-# Erase everything but eq.log; keep dir to tell bot we already processed that commit
+# Erase everything but eq.log and reftest-analyzer
 #
 cd $TARGET_DIR
 mv -f test/eq.log .

@@ -21,10 +21,6 @@ var fs = require('fs'),
     scripts = require('./lib/scripts'),
     queue = require('./lib/queue');
     
-// Vars
-var processedBuffer = [], // buffer of processed commands to avoid concurrency/race conditions
-    maxBufferLength = 1000;
-
 // Sanity check
 if (!process.env.GITHUB_CREDENTIALS) {
   console.log('Environment variable GITHUB_CREDENTIALS not configured');
@@ -86,25 +82,10 @@ function processNewCommands(){
   
   // Loop over every new command in all monitored pull requests
   github.forEachNewCommand(function(cmd){
-    var t1;
-
-    if (processedBuffer.indexOf(cmd.id) > -1) {
-      //
-      // Using a buffer here to double-check we're not reprocessing a command.
-      // This can happen for different reasons, one being weird concurrency/race
-      // conditions, delays in marking a command as "processed" on the server, etc.
-      //
-      console.log((new Date())+': skipping already processed command id '+cmd.id+' (from buffer)');
-      return; // can't process a command already processed
-    }
-    processedBuffer.push(cmd.id);
-    if (processedBuffer.length > maxBufferLength) {
-      processedBuffer.shift();
-    }
+    var t1 = new Date();
     
     console.log((new Date())+': processing new command "'+cmd.command+'" in Pull #'+cmd.pull_number+' from @'+cmd.user+' (id:'+cmd.id+'), queue size: '+queue.size());    
     github.postStartMessage(cmd, 'Processing command **'+(cmd.command||'(empty)')+'** by user _'+cmd.user+'_. Queue size: '+queue.size());
-    t1 = new Date();
     
     //
     // Process each command in queue
@@ -118,7 +99,7 @@ function processNewCommands(){
         // Process 'test' command
         //      
         case 'test':
-          scripts.runTests({
+          scripts.runTest({
             pull_url: cmd.pull_url,
             pull_sha: cmd.pull_sha,
             ref_url: 'git://github.com/'+config.ref_repo+'.git',
@@ -136,23 +117,43 @@ function processNewCommands(){
               if (path.existsSync(config.dest_path+'/tests/'+cmd.pull_sha+'/eq.log')) {
                 var url = 'http://'+config.server_host+':'+config.server_port+'/'+cmd.pull_sha+'/reftest-analyzer.xhtml';
                 url += '#web=/'+cmd.pull_sha+'/eq.log';
-                github.postEndMessage(cmd, (new Date())-t1, '**WARNING: Tests did NOT pass (eq).**\n\nView ref analyzer:\n'+url+'\n\nOutput:\n\n'+output);
+                github.postEndMessage(cmd, (new Date())-t1, '**WARNING: Tests did NOT pass.**\n\nThere was a snapshot difference:\n'+url+'\n\nOutput:\n\n'+output);
               }
               else {
-                github.postEndMessage(cmd, (new Date())-t1, '**WARNING: Tests did NOT pass (load).**\n\nOutput:\n\n'+output);
+                github.postEndMessage(cmd, (new Date())-t1, '**WARNING: Tests did NOT pass.**\n\nOutput:\n\n'+output);
               }
-              console.log((new Date())+': done processing command "'+cmd.command+'" in Pull #'+cmd.pull_number+' from @'+cmd.user+' (id:'+cmd.id+')');
             } // if tests !passed
-
+            console.log((new Date())+': done processing command "'+cmd.command+'" in Pull #'+cmd.pull_number+' from @'+cmd.user+' (id:'+cmd.id+')');
+            
             queue.next();
-          }); // scripts.runTests()
+          }); // scripts.runTest()
           break;
   
         //
-        // Process 'ref' command
+        // Process 'makeref' command
         //      
-        case 'ref':
-          queue.next();
+        case 'makeref':
+          scripts.runMakeref({
+            pull_url: cmd.pull_url,
+            pull_sha: cmd.pull_sha,
+            ref_url: 'git://github.com/'+config.ref_repo+'.git',
+            dest_path: config.dest_path
+          }, 
+          function(output){
+            output = '\n'+output; // hack to get first line into code below
+            output = output.replace(/\n/g, '\n    '); // reformat output as Github/Markdown code
+            // Makeref OK?
+            if (output.search(/makeref OK/) > -1) {
+              github.postEndMessage(cmd, (new Date())-t1, '**References generated** and pushed to `'+config.ref_repo+'`.\n\nOutput:\n\n'+output);
+            }
+            // Makeref NOT ok
+            else {
+              github.postEndMessage(cmd, (new Date())-t1, '**WARNING: Error encountered, references NOT updated!**.\n\nOutput:\n\n'+output);
+            } // if tests !passed
+            console.log((new Date())+': done processing command "'+cmd.command+'" in Pull #'+cmd.pull_number+' from @'+cmd.user+' (id:'+cmd.id+')');
+
+            queue.next();
+          }); // scripts.runMakeref()
           break;
   
         //

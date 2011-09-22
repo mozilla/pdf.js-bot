@@ -1,0 +1,73 @@
+#!/bin/bash
+#
+# Clone source repo to create ref from, create ref
+#
+
+if [ $# -ne 4 ]; then
+  echo 'arguments: <repo_url> <sha> <ref_repo_url> <temp_path>'
+  echo
+  exit
+fi
+
+#
+# Set up vars
+#
+TARGET_URL=$1
+SHA=$2
+REF_URL=$3
+# Get absolute path for current dir
+SCRIPT_DIR="$( cd "$( dirname "$0" )" && pwd )"
+# Hack to get absolute path for tmp path
+mkdir -p $4; cd $4
+TMP_DIR="$( cd "$( dirname "$0" )" && pwd )"
+TARGET_DIR=$TMP_DIR/refs/$SHA
+cd $SCRIPT_DIR
+
+if [ -d $TARGET_DIR ]; then
+  echo 'target dir (' $TARGET_DIR ') already exists - overwriting it...'
+  rm -rf $TARGET_DIR
+fi
+
+#
+# Fetch git repo to be used as ref (target), checkout desired sha
+#
+mkdir -p $TARGET_DIR
+cd $TARGET_DIR
+git clone $TARGET_URL .; git checkout $SHA
+
+#
+# Deploy manifest files, make ref set
+#
+cd $TARGET_DIR
+cp -f $SCRIPT_DIR/test-files/test_manifest.json ./test
+cp -f $SCRIPT_DIR/test-files/browser_manifest.json ./test/resources/browser_manifests
+cp -f $SCRIPT_DIR/test-files/test.py ./test
+cp -f $SCRIPT_DIR/test-files/Makefile .
+make master
+
+if [ ! -d $TARGET_DIR/test/tmp ]; then
+  echo
+  echo "***"
+  echo "ERROR (run-makeref): Could not find test/tmp snapshots!"
+  exit
+fi
+
+#
+# Push up-to-date reference snapshots
+#
+mkdir -p $TARGET_DIR/test/ref_repo
+cd $TARGET_DIR/test/ref_repo
+git init; git pull -f $REF_URL
+cp -Rf ../tmp/* .
+# generate REF-INFO
+echo url $TARGET_URL > REF-INFO
+echo sha $SHA >> REF-INFO
+# push
+./commit-push-clean
+
+#
+# Erase everything
+#
+rm -rf $TARGET_DIR
+
+echo "makeref OK"
