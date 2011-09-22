@@ -30,7 +30,7 @@ fi
 #
 mkdir -p $TARGET_DIR
 cd $TARGET_DIR
-git init; git fetch $TARGET_URL; git checkout $SHA
+git clone $TARGET_URL .; git checkout $SHA
 
 #
 # Pull up-to-date reference snapshots
