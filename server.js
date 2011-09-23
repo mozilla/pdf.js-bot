@@ -77,9 +77,7 @@ function getPublicIP(callback){
 // processNewCommands()
 // Scan Github for commands in open pull requests and process them
 //
-function processNewCommands(){
-  console.log((new Date())+': checking for new commands. queue size: '+queue.size());
-  
+function processNewCommands(){  
   // Loop over every new command in all monitored pull requests
   github.forEachNewCommand(function(cmd){
     var t1 = new Date();
