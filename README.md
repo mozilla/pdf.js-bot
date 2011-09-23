@@ -20,26 +20,44 @@ This bot is used by pdf.js reviewers to run regression tests. The bot lives in `
 
 ## Setting up bot server
 
-**Distro**
+**Distro and basics**
 
-The instructions below assume Ubuntu 11.04. See http://alestic.com/ for a list of EC2 images.
+The instructions below assume **Ubuntu 11.04**. See http://alestic.com/ for a list of EC2 images.
 
-**Install**
+1. `$ sudo apt-get update`
+1. Install via apt-get: `make`, `g++`
 
-1. Install via apt-get: `git`, 
-2. Install `node.js`, `npm` (prefer stable binary packages if available)
-2. Install required node packages: `$ npm install` in the root of `pdf.js-bot/`
-2. Install global node utility forever: `npm install -g forever`
-3. Clone repo: `git clone` to `pdf.js-bot/` dir
+**Browser, Xvfb**
 
-**Configure**
+1. Install via apt-get: `firefox`, `xvfb` (necessary as we will run browsers without a display)
+1. Test `xvfb` via `$ xvfb-run firefox`. Firefox shouldn't bail out with a no-display message.
+1. Configure `xvfb` by adding to `/etc/profile`:
 
-0. Set up Github `ssh` key for `@pdfjsbot` user, as per Github docs (bot needs ssh authority to push to ref repo)
-1. Configure Github environment variable: `$export GITHUB_CREDENTIALS=pdfjsbot:<password_here>`
-2. Configure bot with right parameters: `config.json`
-3. Configure test manifest file: `test/test_manifest.json`
-4. Configure browser manifest file: `test/resources/browser_manifests/browser_manifest.json`
+        Xvfb :1 1>/dev/null 2>/dev/null &
+        export DISPLAY=:1
 
-**Launch**
+1. `$ sudo reboot`
 
+**Git, Github**
+
+1. Install via apt-get: `git`
+1. Set up Github `ssh` key for `@pdfjsbot` user, as per Github docs (bot needs ssh authority to push to ref repo)
+1. Test ssh key: `$ ssh -T git@github.com`
+1. Configure Github API credentials: `$ export GITHUB_CREDENTIALS=pdfjsbot:<password_here>`
+
+**Node.js**
+
+1. Install `nodejs` and `nodejs-dev` from binaries: https://github.com/joyent/node/wiki/Installing-Node.js-via-package-manager
+1. Make sure `nodejs-dev` and `g++` are installed before proceeding!
+1. Install node.js package manager npm: `$ curl http://npmjs.org/install.sh | sudo sh`
+1. Install global node utility forever: `$ sudo npm install -g forever`
+
+
+**Bot**
+
+1. Clone repo into home dir: `$ git clone <pdf.js-bot-URL>`
+1. Install required node packages: `$ cd pdf.js-bot; npm install`
+1. Configure parameters: `config.json`
+1. Configure desired tests: `test-files/test_manifest.json`
+1. Configure browser manifest file: `test-files/browser_manifest.json`
 1. Start bot with `forever server.js`
