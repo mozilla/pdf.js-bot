@@ -54,7 +54,7 @@ COMMIT_EXISTS=`cd $TARGET_DIR; git show $ORIGINAL_SHA --format="commit exists: %
 if [ -z "$COMMIT_EXISTS" ]; then # is COMMIT_EXISTS zero-length? (i.e. no match)
   echo
   echo "***"
-  echo "ERROR: Cannot proceed with tests, as reference repo is out of sync with source (could not find originating commit/SHA into this pull's index)."
+  echo "ERROR: Cannot proceed with tests, as reference snapshots are out of sync with source (could not find snapshot's originating commit/SHA into this pull's index)."
   echo "Try merging the commit used to generate the current snapshots ($ORIGINAL_SHA) into this pull request."
   exit
 fi
