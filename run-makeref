@@ -35,6 +35,14 @@ mkdir -p $TARGET_DIR
 cd $TARGET_DIR
 git clone $TARGET_URL .; git checkout $SHA
 
+
+#
+# Copy existing PDFs *from* local cache
+#
+cd $TARGET_DIR
+cp -n /tmp/pdf-cache/* test/pdfs
+
+
 #
 # Deploy manifest files, make ref set
 #
@@ -44,12 +52,22 @@ Xvfb :1 1>/dev/null 2>/dev/null &
 make master
 killall -9 Xvfb 1>/dev/null 2>/dev/null
 
+
+#
+# Copy new PDFs *to* local cache
+#
+cd $TARGET_DIR
+mkdir -p /tmp/pdf-cache
+cp -n test/pdfs/*.pdf /tmp/pdf-cache
+
+
 if [ ! -d $TARGET_DIR/test/tmp ]; then
   echo
   echo "***"
   echo "ERROR (run-makeref): Could not find test/tmp snapshots!"
   exit
 fi
+
 
 #
 # Push up-to-date reference snapshots
