@@ -31,7 +31,7 @@ The instructions below assume **Ubuntu 11.04**. See http://alestic.com/ for a li
 
 1. Install via apt-get: `firefox`, `xvfb` (necessary as we will run browsers without a display)
 1. Test `xvfb` via `$ xvfb-run firefox`. Firefox shouldn't bail out with a no-display message.
-1. Configure `xvfb` by adding to `/etc/profile`:
+1. Configure `xvfb` by appending to `/etc/profile`:
 
         /usr/bin/Xvfb :1 1>/dev/null 2>/dev/null &
         export DISPLAY=:1
@@ -46,7 +46,9 @@ The instructions below assume **Ubuntu 11.04**. See http://alestic.com/ for a li
 1. Test ssh key: `$ ssh -T git@github.com`
 1. Set up ssh agent to avoid repeated password entry: `$ exec ssh-agent bash`, `$ ssh-add ~/.ssh/id_rsa`
 1. Configure git signatures: `$ git config --global user.name "pdfjs bot"`, `git config --global user.email "pdfjsbot@gmail.com"`
-1. Set Github API credentials: `$ export GITHUB_CREDENTIALS=pdfjsbot:<password_here>`
+1. Set Github API credentials by appending to `/etc/profile`:
+
+    export GITHUB_CREDENTIALS=pdfjsbot:<password_here>
 
 **Node.js**
 
