@@ -42,6 +42,13 @@ git clone $TARGET_URL .; git checkout --quiet $SHA
 mkdir -p $TARGET_DIR/test/ref
 cd $TARGET_DIR/test/ref
 git init; git pull -f $REF_URL
+echo
+echo "******"
+echo "REFERENCE SNAPSHOTS GENERATED FROM (REF-INFO):"
+cat REF-INFO
+echo "******"
+echo
+
 
 #
 # Check if commit/SHA used to generate snapshots is present in target history

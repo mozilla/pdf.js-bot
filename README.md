@@ -65,4 +65,5 @@ The instructions below assume **Ubuntu 11.04**. See http://alestic.com/ for a li
 1. Install required node packages: `$ cd pdf.js-bot; npm install`
 1. Configure parameters: `config.json`
 1. Configure browser manifest file: `test-files/browser_manifest.json`
-1. Start bot with `$ forever server.js > /tmp/bot.log &`
+1. Start bot with `$ forever start -o /tmp/bot.log server.js`
+1. (You can stop server with `$ forever stop 0`)
