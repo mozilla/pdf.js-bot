@@ -33,7 +33,7 @@ The instructions below assume **Ubuntu 11.04**. See http://alestic.com/ for a li
 1. Test `xvfb` via `$ xvfb-run firefox`. Firefox shouldn't bail out with a no-display message.
 1. Configure `xvfb` by adding to `/etc/profile`:
 
-        Xvfb :1 1>/dev/null 2>/dev/null &
+        /usr/bin/Xvfb :1 1>/dev/null 2>/dev/null &
         export DISPLAY=:1
 
 1. `$ sudo reboot`
