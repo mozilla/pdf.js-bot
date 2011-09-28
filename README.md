@@ -44,6 +44,7 @@ The instructions below assume **Ubuntu 11.04**. See http://alestic.com/ for a li
 1. Create Github ssh key in `~/.ssh`: `$ ssh-keygen -t rsa -C "pdfjsbot@gmail.com"`
 1. Log into Github as @pdfjsbot, add public ssh key from file `~/.ssh/id_rsa.pub`
 1. Test ssh key: `$ ssh -T git@github.com`
+1. Set up ssh agent to avoid repeated password entry: `$ exec ssh-agent bash`, `$ ssh-add ~/.ssh/id_rsa`
 1. Configure git signatures: `$ git config --global user.name "pdfjs bot"`, `git config --global user.email "pdfjsbot@gmail.com"`
 1. Set Github API credentials: `$ export GITHUB_CREDENTIALS=pdfjsbot:<password_here>`
 
