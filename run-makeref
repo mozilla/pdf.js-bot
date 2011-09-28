@@ -33,7 +33,7 @@ fi
 #
 mkdir -p $TARGET_DIR
 cd $TARGET_DIR
-git clone $TARGET_URL .; git checkout $SHA
+git clone $TARGET_URL .; git checkout --quiet $SHA
 
 
 #
