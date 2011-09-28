@@ -1,6 +1,6 @@
 [
    {
     "name":"firefox",
-    "path":"/Applications/Firefox Beta.app"
+    "path":"/usr/bin/firefox"
    }
 ]
