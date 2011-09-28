@@ -41,9 +41,11 @@ The instructions below assume **Ubuntu 11.04**. See http://alestic.com/ for a li
 **Git, Github**
 
 1. Install via apt-get: `git`
-1. Set up Github ssh key for `@pdfjsbot` user, as per Github docs (bot needs ssh authority to push to ref repo)
+1. Create Github ssh key in `~/.ssh`: `$ ssh-keygen -t rsa -C "pdfjsbot@gmail.com"`
+1. Log into Github as @pdfjsbot, add public ssh key from file `~/.ssh/id_rsa.pub`
 1. Test ssh key: `$ ssh -T git@github.com`
-1. Configure Github API credentials: `$ export GITHUB_CREDENTIALS=pdfjsbot:<password_here>`
+1. Configure git signatures: `$ git config --global user.name "pdfjs bot"`, `git config --global user.email "pdfjsbot@gmail.com"`
+1. Set Github API credentials: `$ export GITHUB_CREDENTIALS=pdfjsbot:<password_here>`
 
 **Node.js**
 
@@ -58,6 +60,5 @@ The instructions below assume **Ubuntu 11.04**. See http://alestic.com/ for a li
 1. Clone repo into home dir: `$ git clone <pdf.js-bot-URL>`
 1. Install required node packages: `$ cd pdf.js-bot; npm install`
 1. Configure parameters: `config.json`
-1. Configure desired tests: `test-files/test_manifest.json`
 1. Configure browser manifest file: `test-files/browser_manifest.json`
 1. Start bot with `$ forever server.js > /tmp/bot.log`

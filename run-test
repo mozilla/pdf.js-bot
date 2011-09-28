@@ -67,7 +67,6 @@ fi
 # Deploy manifest files, run tests
 #
 cd $TARGET_DIR
-cp -f $SCRIPT_DIR/test-files/test_manifest.json ./test
 cp -f $SCRIPT_DIR/test-files/browser_manifest.json ./test/resources/browser_manifests
 cp -f $SCRIPT_DIR/test-files/test.py ./test
 cp -f $SCRIPT_DIR/test-files/Makefile .
