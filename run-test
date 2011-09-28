@@ -51,11 +51,7 @@ git init; git pull -f $REF_URL
 cd $TARGET_DIR/test/ref
 ORIGINAL_SHA=`grep 'sha' REF-INFO | sed -e 's/sha \([0-9a-z]*\)/\1/g'` # get SHA from REF-INFO
 COMMIT_EXISTS=`cd $TARGET_DIR; git show $ORIGINAL_SHA --format="commit exists: %h" | grep 'commit exists'` # ask git if SHA exists in index
-# is COMMIT_EXISTS zero-length? (i.e. no match)
-if [ -z $COMMIT_EXISTS ]; then
-
-echo 'commit_exists: ' $COMMIT_EXISTS
-
+if [ -z "$COMMIT_EXISTS" ]; then # is COMMIT_EXISTS zero-length? (i.e. no match)
   echo
   echo "***"
   echo "ERROR: Cannot proceed with tests, as reference repo is out of sync with source (could not find originating commit/SHA into this pull's index)."
