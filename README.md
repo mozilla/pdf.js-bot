@@ -9,13 +9,13 @@ This bot is used by pdf.js reviewers to run regression tests. The bot lives in `
 
 1. User submits pull request to main repo
 2. Reviewer leaves comment `@pdfjsbot test`
-3. `@pdfjsbot` pulls most recent SHA of the pull request, runs test against `pdf.js-ref` repo, and comments back with the results of test
+3. `@pdfjsbot` clones repo of requester; checks out top SHA of pull request; pulls `pdf.js-ref` repo containing snapshots; runs `make test` in requester repo; and comments back with the results of test
 
 **Generating reference snapshots**
 
 1. User submits pull request to main repo containing new features
 1. Reviewer leaves comment `@pdfjsbot makeref`
-2. `@pdfjsbot` pulls most recent SHA of the pull request, generates snapshots, and pushes them to the `pdf.js-ref` repo
+2. `@pdfjsbot` clones repo of requester; checks out top SHA of pull request; runs `make master` in requester repo; and (force-)pushes snapshots to `pdf.js-ref` repo
 
 
 ## Setting up bot server

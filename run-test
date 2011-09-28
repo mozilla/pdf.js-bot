@@ -60,6 +60,12 @@ if [ -z "$COMMIT_EXISTS" ]; then # is COMMIT_EXISTS zero-length? (i.e. no match)
 fi
 
 #
+# Copy existing PDFs *from* local cache
+#
+cd $TARGET_DIR
+cp -n /tmp/pdf-cache/* test/pdfs
+
+#
 # Deploy manifest files, run tests
 #
 cd $TARGET_DIR
@@ -67,6 +73,13 @@ cp -f $SCRIPT_DIR/test-files/browser_manifest.json ./test/resources/browser_mani
 Xvfb :1 1>/dev/null 2>/dev/null &
 make test
 killall -9 Xvfb 1>/dev/null 2>/dev/null
+
+#
+# Copy new PDFs *to* local cache
+#
+cd $TARGET_DIR
+mkdir -p /tmp/pdf-cache
+cp -n test/pdfs/*.pdf /tmp/pdf-cache
 
 #
 # Erase everything but eq.log and reftest-analyzer
