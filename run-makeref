@@ -40,9 +40,9 @@ git clone $TARGET_URL .; git checkout $SHA
 #
 cd $TARGET_DIR
 cp -f $SCRIPT_DIR/test-files/browser_manifest.json ./test/resources/browser_manifests
-cp -f $SCRIPT_DIR/test-files/test.py ./test
-cp -f $SCRIPT_DIR/test-files/Makefile .
+Xvfb :1 1>/dev/null 2>/dev/null
 make master
+killall -9 Xvfb 1>/dev/null 2>/dev/null
 
 if [ ! -d $TARGET_DIR/test/tmp ]; then
   echo
