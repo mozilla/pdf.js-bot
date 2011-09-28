@@ -85,6 +85,6 @@ cp -n test/pdfs/*.pdf /tmp/pdf-cache
 # Erase everything but eq.log and reftest-analyzer
 #
 cd $TARGET_DIR
-mv -f test/eq.log .
-mv -f test/resources/reftest-analyzer.xhtml .
+mv -f test/eq.log . 2>/dev/null
+mv -f test/resources/reftest-analyzer.xhtml . 2>/dev/null
 find . ! -iname 'eq.log' -and ! -iname 'reftest-analyzer.xhtml' -delete
