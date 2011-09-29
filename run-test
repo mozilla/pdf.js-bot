@@ -104,7 +104,6 @@ cd $TARGET_DIR
 echo 
 echo "Running linter..."
 make lint
-echo
 
 
 #
