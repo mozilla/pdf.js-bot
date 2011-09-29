@@ -45,12 +45,6 @@ git clone $TARGET_URL .; git checkout --quiet $SHA
 mkdir -p $TARGET_DIR/test/ref
 cd $TARGET_DIR/test/ref
 git init; git pull -f $REF_URL
-echo
-echo "***"
-echo "Reference snapshots generated from:"
-cat REF-INFO
-echo "***"
-echo
 
 
 #
@@ -59,12 +53,18 @@ echo
 #
 cd $TARGET_DIR/test/ref
 ORIGINAL_SHA=`grep 'sha' REF-INFO | sed -e 's/sha \([0-9a-z]*\)/\1/g'` # get SHA from REF-INFO
-COMMIT_EXISTS=`cd $TARGET_DIR; git show $ORIGINAL_SHA --format="commit exists: %h" | grep 'commit exists'` # ask git if SHA exists in index
+COMMIT_EXISTS=`cd $TARGET_DIR; git log --format="%H" | grep $ORIGINAL_SHA` # ask git if SHA exists in index
 if [ -z "$COMMIT_EXISTS" ]; then # is COMMIT_EXISTS zero-length? (i.e. no match)
   echo
   echo "***"
-  echo "WARNING: This pull request does not contain the commit used to generated reference snapshots"
-  echo "         But if the tests all pass, that should be OK."
+  echo "WARNING: This pull request does not contain the commit used to generate reference images."
+  echo "         If the tests all pass, that should be OK."
+  echo "         If not, it could be because of a missing feature in this pull request."
+  echo "         Try merging the master branch from the main repo into this pull request,"
+  echo "         and issuing another test."
+  echo "***"
+  echo "Commit used to create snapshots (REF-INFO file from reference repo):"
+  cat $TARGET_DIR/test/ref/REF-INFO
   echo "***"
   echo
 fi
