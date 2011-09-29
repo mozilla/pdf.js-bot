@@ -18,11 +18,38 @@ This bot is used by pdf.js reviewers to run regression tests. The bot lives in `
 2. `@pdfjsbot` clones repo of requester; checks out top SHA of pull request; runs `make master` in requester repo; and (force-)pushes snapshots to `pdf.js-ref` repo
 
 
+## Troubleshooting
+
+**Logging into EC2**
+
+To log into the server:
+
+    $ ssh -i <ssh_key_file.pem> ubuntu@<ec2_machine_address>
+
+The two unknowns above should be known by the bot collaborators.
+
+**Log file**
+
+This is the first place to take a peek at:
+
+    /tmp/bot.log
+
+(TODO: place file in `/var/log` and configure `logrotate`)
+    
+**Restarting bot**
+
+    $ cd pdf.js-bot/
+    $ forever stop 0
+    $ forever start -o /tmp/bot.log server.js
+
+And cross your fingers :)
+
+
 ## Setting up bot server
 
 **Distro and basics**
 
-The instructions below assume **Ubuntu 11.04**. See http://alestic.com/ for a list of EC2 images.
+The instructions below assume we'll be deploying on **Ubuntu 11.04**. See http://alestic.com/ for a list of EC2 images.
 
 1. `$ sudo apt-get update`
 1. Install via apt-get: `make`, `g++`
@@ -78,29 +105,3 @@ _(Use this for local tests)_
 1. Set environment variable `$ export PDFJSBOT_STAGING=yes`
 1. Start bot with `$ node server.js`
 
-
-## Troubleshooting
-
-**Logging into EC2**
-
-To log into the server:
-
-    $ ssh -i <ssh_key_file.pem> ubuntu@<ec2_machine_address>
-
-The two unknowns above should be known by the bot collaborators.
-
-**Log file**
-
-This is the first place to take a peek at:
-
-    /tmp/bot.log
-
-(TODO: place file in `/var/log` and configure `logrotate`)
-    
-**Restarting bot**
-
-    $ cd pdf.js-bot/
-    $ forever stop 0
-    $ forever start -o /tmp/bot.log server.js
-
-And cross your fingers :)
