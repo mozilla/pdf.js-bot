@@ -12,7 +12,6 @@
 // Modules
 var fs = require('fs'),
     net = require('net'),
-    config = JSON.parse( fs.readFileSync('config.json').toString() ),
     express = require('express'),
     app = express.createServer(),
     path = require('path'),
@@ -20,13 +19,25 @@ var fs = require('fs'),
     github = require('./lib/github'),
     scripts = require('./lib/scripts'),
     queue = require('./lib/queue');
+
+var config = {},
+    configFile = 'config.json';
     
-// Sanity check
+//
+// Environment vars
+//
 if (!process.env.GITHUB_CREDENTIALS) {
   console.log('Environment variable GITHUB_CREDENTIALS not configured');
   console.log('Example: GITHUB_CREDENTIALS=pdfjsbot:password123\n');
   process.exit();
 }
+
+if (process.env.PDFJSBOT_STAGING === 'yes') {
+  configFile = 'config_staging.json';
+}
+
+console.log((new Date())+': reading configurations from file "'+configFile+'"');
+config = JSON.parse( fs.readFileSync(configFile).toString() );
 config.github_creds = process.env.GITHUB_CREDENTIALS;
 
 //
@@ -97,70 +108,78 @@ function processNewCommands(){
         // Process 'test' command
         //      
         case 'test':
-          scripts.runTest({
-            pull_url: cmd.pull_url,
-            pull_sha: cmd.pull_sha,
-            ref_url: 'git://github.com/'+config.ref_repo+'.git',
-            dest_path: config.dest_path
-          }, 
-          function(output){
-            output = '\n'+output; // hack to get first line into code below
-            output = output.replace(/\n/g, '\n    '); // reformat output as Github/Markdown code
-            // Tests passed?
-            if (output.search(/All tests passed/) > -1) {
-              github.postEndMessage(cmd, (new Date())-t1, '**All tests passed.**\n\nOutput:\n\n'+output);
-            }
-            // Tests DID NOT pass
-            else {
-              if (path.existsSync(config.dest_path+'/tests/'+cmd.pull_sha+'/eq.log')) {
-                var url = 'http://'+config.server_host+':'+config.server_port+'/'+cmd.pull_sha+'/reftest-analyzer.xhtml';
-                url += '#web=/'+cmd.pull_sha+'/eq.log';
-                github.postEndMessage(cmd, (new Date())-t1, '**WARNING: Tests did NOT pass.**\n\nThere was a snapshot difference:\n'+url+'\n\nOutput:\n\n'+output);
+          scripts.runTest(
+            {
+              pull_url: cmd.pull_url,
+              pull_sha: cmd.pull_sha,
+              ref_url: 'git://github.com/'+config.ref_repo+'.git',
+              dest_path: config.dest_path
+            }, 
+            function(output){
+              output = '\n'+output; // hack to get first line into code below
+              output = output.replace(/\n/g, '\n    '); // reformat output as Github/Markdown code
+              // Tests passed?
+              if (output.search(/All tests passed/) > -1) {
+                github.postEndMessage(cmd, (new Date())-t1, '**All tests passed.**\n\nOutput:\n\n'+output);
               }
+              // Tests DID NOT pass
               else {
-                github.postEndMessage(cmd, (new Date())-t1, '**WARNING: Tests did NOT pass.**\n\nOutput:\n\n'+output);
-              }
-            } // if tests !passed
-            console.log((new Date())+': done processing command "'+cmd.command+'" in Pull #'+cmd.pull_number+' from @'+cmd.user+' (id:'+cmd.id+')');
+                if (path.existsSync(config.dest_path+'/tests/'+cmd.pull_sha+'/eq.log')) {
+                  var url = 'http://'+config.server_host+':'+config.server_port+'/'+cmd.pull_sha+'/reftest-analyzer.xhtml';
+                  url += '#web=/'+cmd.pull_sha+'/eq.log';
+                  github.postEndMessage(cmd, (new Date())-t1, '**WARNING: Tests did NOT pass.**\n\nThere was a snapshot difference:\n'+url+'\n\nOutput:\n\n'+output);
+                }
+                else {
+                  github.postEndMessage(cmd, (new Date())-t1, '**WARNING: Tests did NOT pass.**\n\nOutput:\n\n'+output);
+                }
+              } // if tests !passed
+              console.log((new Date())+': done processing command "'+cmd.command+'" in Pull #'+cmd.pull_number+' from @'+cmd.user+' (id:'+cmd.id+')');
             
-            queue.next();
-          }); // scripts.runTest()
+              queue.next();
+            }
+          ); // runTest()
           break;
   
         //
         // Process 'makeref' command
         //      
         case 'makeref':
-          scripts.runMakeref({
-            pull_url: cmd.pull_url,
-            pull_sha: cmd.pull_sha,
-            ref_url: 'git://github.com/'+config.ref_repo+'.git',
-            dest_path: config.dest_path
-          }, 
-          function(output){
-            output = '\n'+output; // hack to get first line into code below
-            output = output.replace(/\n/g, '\n    '); // reformat output as Github/Markdown code
-            // Makeref OK?
-            if (output.search(/makeref OK/) > -1) {
-              github.postEndMessage(cmd, (new Date())-t1, '**References generated** and pushed to `'+config.ref_repo+'`.\n\nOutput:\n\n'+output);
-            }
-            // Makeref NOT ok
-            else {
-              github.postEndMessage(cmd, (new Date())-t1, '**WARNING: Error encountered, references NOT updated!**.\n\nOutput:\n\n'+output);
-            } // if tests !passed
-            console.log((new Date())+': done processing command "'+cmd.command+'" in Pull #'+cmd.pull_number+' from @'+cmd.user+' (id:'+cmd.id+')');
+          scripts.runMakeref(
+            {
+              pull_url: cmd.pull_url,
+              pull_sha: cmd.pull_sha,
+              ref_url: 'git://github.com/'+config.ref_repo+'.git',
+              dest_path: config.dest_path
+            }, 
+            function(output){
+              output = '\n'+output; // hack to get first line into code below
+              output = output.replace(/\n/g, '\n    '); // reformat output as Github/Markdown code
+              // Makeref OK?
+              if (output.search(/makeref OK/) > -1) {
+                github.postEndMessage(cmd, (new Date())-t1, '**References generated** and pushed to `'+config.ref_repo+'`.\n\nOutput:\n\n'+output);
+              }
+              // Makeref NOT ok
+              else {
+                github.postEndMessage(cmd, (new Date())-t1, '**WARNING: Error encountered, references NOT updated!**.\n\nOutput:\n\n'+output);
+              } // if tests !passed
+              console.log((new Date())+': done processing command "'+cmd.command+'" in Pull #'+cmd.pull_number+' from @'+cmd.user+' (id:'+cmd.id+')');
 
-            queue.next();
-          }); // scripts.runMakeref()
+              queue.next();
+            }
+          ); // runMakeref()
           break;
   
         //
         // Process unknown command
         //      
         default:
-          github.postEndMessage(cmd, (new Date())-t1, 'Unknown command: ' + (cmd.command || '(empty)'));
-          queue.next();
-      } // switch
+          // Timeout hack to ensure Github response comes after "Processing" message
+          setTimeout(function(){
+            github.postEndMessage(cmd, (new Date())-t1, 'Unknown command: ' + (cmd.command || '(empty)'));
+            queue.next();
+          }, 2000);
+          
+      }; // switch
     }); // queue.push
   }); // forEachNewCommand
 }; // checkNewMessages()

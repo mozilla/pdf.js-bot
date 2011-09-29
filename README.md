@@ -58,12 +58,21 @@ The instructions below assume **Ubuntu 11.04**. See http://alestic.com/ for a li
 1. Install node.js package manager npm: `$ curl http://npmjs.org/install.sh | sudo sh`
 1. Install global node utility forever: `$ sudo npm install -g forever`
 
-
 **Bot**
 
 1. Clone repo into home dir: `$ git clone <pdf.js-bot-URL>`
 1. Install required node packages: `$ cd pdf.js-bot; npm install`
-1. Configure parameters: `config.json`
 1. Configure browser manifest file: `test-files/browser_manifest.json`
+
+**Launch: Production**
+
+1. Check if default parameters are OK: `config.json`
 1. Start bot with `$ forever start -o /tmp/bot.log server.js`
 1. (You can stop server with `$ forever stop 0`)
+
+**Launch: Staging**
+_(Use this for local tests)_
+
+1. Configure parameters for your own tests in: `config_staging.json`
+1. Set environment variable `$ export PDFJSBOT_STAGING=yes`
+1. Start bot with `$ node server.js`

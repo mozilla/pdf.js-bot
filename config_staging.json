@@ -1,0 +1,8 @@
+{
+  "check_interval": 30,
+  "botname": "@pdfjsbot",  
+  "main_repo": "arturadib/pdf.js",
+  "ref_repo": "arturadib/pdf.js-ref",
+  "dest_path": "./tmp",
+  "server_port": 8989
+}
