@@ -98,6 +98,16 @@ cp -n test/pdfs/*.pdf /tmp/pdf-cache
 
 
 #
+# Run linter
+#
+cd $TARGET_DIR
+echo 
+echo "Running linter..."
+make lint
+echo
+
+
+#
 # Erase everything but eq.log and reftest-analyzer
 #
 cd $TARGET_DIR
