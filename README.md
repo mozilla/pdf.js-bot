@@ -63,8 +63,6 @@ The instructions below assume we'll be deploying on **Ubuntu 11.04**. See http:/
         /usr/bin/Xvfb :1 1>/dev/null 2>/dev/null &
         export DISPLAY=:1
 
-1. `$ sudo reboot`
-
 **Git, Github**
 
 1. Install via apt-get: `git`
@@ -77,6 +75,9 @@ The instructions below assume we'll be deploying on **Ubuntu 11.04**. See http:/
 1. Set Github API credentials by appending to `/etc/profile`:
 
         export GITHUB_CREDENTIALS=pdfjsbot:<password_here>
+
+1. Run `$ /etc/profile`, or `$ sudo reboot` to effect profile changes
+
 
 **Node.js**
 
