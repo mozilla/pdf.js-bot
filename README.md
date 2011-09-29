@@ -49,7 +49,7 @@ The instructions below assume **Ubuntu 11.04**. See http://alestic.com/ for a li
 1. Configure git signatures: `$ git config --global user.name "pdfjs bot"`, `git config --global user.email "pdfjsbot@gmail.com"`
 1. Set Github API credentials by appending to `/etc/profile`:
 
-    export GITHUB_CREDENTIALS=pdfjsbot:<password_here>
+        export GITHUB_CREDENTIALS=pdfjsbot:<password_here>
 
 **Node.js**
 
@@ -71,6 +71,7 @@ The instructions below assume **Ubuntu 11.04**. See http://alestic.com/ for a li
 1. (You can stop server with `$ forever stop 0`)
 
 **Launch: Staging**
+
 _(Use this for local tests)_
 
 1. Configure parameters for your own tests in: `config_staging.json`
