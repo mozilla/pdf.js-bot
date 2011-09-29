@@ -76,3 +76,30 @@ _(Use this for local tests)_
 1. Configure parameters for your own tests in: `config_staging.json`
 1. Set environment variable `$ export PDFJSBOT_STAGING=yes`
 1. Start bot with `$ node server.js`
+
+
+## Troubleshooting
+
+**Logging into EC2**
+
+To log into the server:
+
+    $ ssh -i <ssh_key_file.pem> ubuntu@<ec2_machine_address>
+
+The two unknowns above should be known by the bot collaborators.
+
+**Log file**
+
+This is the first place to take a peek at:
+
+    /tmp/bot.log
+
+(TODO: place file in `/var/log` and configure `logrotate`)
+    
+**Restarting bot**
+
+    $ cd pdf.js-bot/
+    $ forever stop 0
+    $ forever start -o /tmp/bot.log server.js
+
+And cross your fingers :)
