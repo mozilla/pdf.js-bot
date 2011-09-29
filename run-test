@@ -43,10 +43,10 @@ mkdir -p $TARGET_DIR/test/ref
 cd $TARGET_DIR/test/ref
 git init; git pull -f $REF_URL
 echo
-echo "******"
-echo "REFERENCE SNAPSHOTS GENERATED FROM (REF-INFO):"
+echo "***"
+echo "Reference snapshots generated from:"
 cat REF-INFO
-echo "******"
+echo "***"
 echo
 
 
@@ -61,9 +61,9 @@ COMMIT_EXISTS=`cd $TARGET_DIR; git show $ORIGINAL_SHA --format="commit exists: %
 if [ -z "$COMMIT_EXISTS" ]; then # is COMMIT_EXISTS zero-length? (i.e. no match)
   echo
   echo "***"
-  echo "ERROR: Cannot proceed with tests, as reference snapshots are out of sync with source (could not find snapshot's originating commit/SHA into this pull's index)."
-  echo "Try merging the commit used to generate the current snapshots ($ORIGINAL_SHA) into this pull request."
-  exit
+  echo "WARNING: This pull request does not contain the commit used to generated reference snapshots"
+  echo "         But if the tests all pass, that is generally OK."
+  echo "***"
 fi
 
 #
