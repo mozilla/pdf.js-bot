@@ -10,6 +10,7 @@ if [ $# -ne 4 ]; then
   exit
 fi
 
+
 #
 # Set up vars
 #
@@ -29,12 +30,14 @@ if [ -d $TARGET_DIR ]; then
   rm -rf $TARGET_DIR
 fi
 
+
 #
 # Fetch git repo to be tested (target), checkout desired sha
 #
 mkdir -p $TARGET_DIR
 cd $TARGET_DIR
 git clone $TARGET_URL .; git checkout --quiet $SHA
+
 
 #
 # Pull reference snapshots
@@ -52,8 +55,7 @@ echo
 
 #
 # Check if commit/SHA used to generate snapshots is present in target history
-# (can't proceed with test if not, as it means commit/SHA has not been 
-#  merged yet)
+# and issue WARNING if not present
 #
 cd $TARGET_DIR/test/ref
 ORIGINAL_SHA=`grep 'sha' REF-INFO | sed -e 's/sha \([0-9a-z]*\)/\1/g'` # get SHA from REF-INFO
@@ -62,15 +64,18 @@ if [ -z "$COMMIT_EXISTS" ]; then # is COMMIT_EXISTS zero-length? (i.e. no match)
   echo
   echo "***"
   echo "WARNING: This pull request does not contain the commit used to generated reference snapshots"
-  echo "         But if the tests all pass, that is generally OK."
+  echo "         But if the tests all pass, that should be OK."
   echo "***"
+  echo
 fi
+
 
 #
 # Copy existing PDFs *from* local cache
 #
 cd $TARGET_DIR
 cp -n /tmp/pdf-cache/* test/pdfs
+
 
 #
 # Deploy test/ files, run tests
@@ -83,12 +88,14 @@ Xvfb :1 1>/dev/null 2>/dev/null &
 make test
 killall -9 Xvfb 1>/dev/null 2>/dev/null
 
+
 #
 # Copy new PDFs *to* local cache
 #
 cd $TARGET_DIR
 mkdir -p /tmp/pdf-cache
 cp -n test/pdfs/*.pdf /tmp/pdf-cache
+
 
 #
 # Erase everything but eq.log and reftest-analyzer
