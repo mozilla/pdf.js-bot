@@ -1,0 +1,6 @@
+#!/bin/bash
+
+git pull
+forever stop 0
+forever start -o /tmp/bot.log server.js
+
