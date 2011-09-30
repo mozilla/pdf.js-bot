@@ -162,7 +162,7 @@ function processNewCommands(){
               }
               // Makeref NOT ok
               else {
-                github.postEndMessage(cmd, (new Date())-t1, '**WARNING: Error encountered, references NOT updated!**.\n\nOutput:\n\n'+output);
+                github.postEndMessage(cmd, (new Date())-t1, '**WARNING: Error(s) encountered!**.\n\nOutput:\n\n'+output);
               } // if tests !passed
               console.log((new Date())+': done processing command "'+cmd.command+'" in Pull #'+cmd.pull_number+' from @'+cmd.user+' (id:'+cmd.id+')');
 
