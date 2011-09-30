@@ -56,6 +56,7 @@ cp -f $SCRIPT_DIR/test-files/local.mk . 2>/dev/null
 cp -f $SCRIPT_DIR/test-files/browser_manifest.json ./test/resources/browser_manifests 2>/dev/null
 cp -f $SCRIPT_DIR/test-files/test_manifest.json ./test 2>/dev/null
 cp -f $SCRIPT_DIR/test-files/test.py ./test 2>/dev/null
+cp -f $SCRIPT_DIR/test-files/driver.js ./test 2>/dev/null
 Xvfb :1 1>/dev/null 2>/dev/null &
 make master
 killall -9 Xvfb 1>/dev/null 2>/dev/null

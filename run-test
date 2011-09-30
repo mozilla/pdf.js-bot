@@ -87,6 +87,7 @@ cd $TARGET_DIR
 cp -f $SCRIPT_DIR/test-files/browser_manifest.json ./test/resources/browser_manifests
 cp -f $SCRIPT_DIR/test-files/test_manifest.json ./test 2>/dev/null
 cp -f $SCRIPT_DIR/test-files/test.py ./test 2>/dev/null
+cp -f $SCRIPT_DIR/test-files/driver.js ./test 2>/dev/null
 Xvfb :1 1>/dev/null 2>/dev/null &
 make test
 killall -9 Xvfb 1>/dev/null 2>/dev/null
