@@ -35,6 +35,13 @@ This is the first place to take a peek at:
     /tmp/bot.log
 
 (TODO: place file in `/var/log` and configure `logrotate`)
+
+**Updating and restarting bot**
+
+There's a script for that:
+
+    $ cd pdf.js-bot/
+    $ ./update
     
 **Restarting bot**
 
