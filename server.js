@@ -156,7 +156,8 @@ function processNewCommands(){
               output = '\n'+output; // hack to get first line into code below
               output = output.replace(/\n/g, '\n    '); // reformat output as Github/Markdown code
               // Makeref OK?
-              if (output.search(/makeref OK/) > -1) {
+              if (output.search(/All tests passed/) > -1 && // 'make test'
+                  output.search(/files checked, no errors found/)) { // 'make lint'
                 github.postEndMessage(cmd, (new Date())-t1, '**References generated** and pushed to `'+config.ref_repo+'`.\n\nOutput:\n\n'+output);
               }
               // Makeref NOT ok

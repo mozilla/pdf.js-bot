@@ -79,6 +79,15 @@ fi
 
 
 #
+# Run linter
+#
+echo
+echo "========== Running 'make lint'"
+cd $TARGET_DIR
+make lint
+
+
+#
 # Push up-to-date reference snapshots
 #
 echo
@@ -97,5 +106,3 @@ echo sha $SHA >> REF-INFO
 # Erase everything
 #
 rm -rf $TARGET_DIR
-
-echo "makeref OK"
