@@ -68,7 +68,6 @@ if [ -z "$COMMIT_EXISTS" ]; then # is COMMIT_EXISTS zero-length? (i.e. no match)
   echo "Commit used to create snapshots (REF-INFO file from reference repo):"
   cat $TARGET_DIR/test/ref/REF-INFO
   echo "***"
-  echo
 fi
 
 
