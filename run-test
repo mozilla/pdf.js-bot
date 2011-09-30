@@ -72,6 +72,15 @@ fi
 
 
 #
+# Run linter - MUST COME BEFORE OVERWRITING ANY test/ FILES!
+#
+echo
+echo "========== Running 'make lint'"
+cd $TARGET_DIR
+make lint
+
+
+#
 # Copy existing PDFs *from* local cache
 #
 cd $TARGET_DIR
@@ -99,15 +108,6 @@ killall -9 Xvfb 1>/dev/null 2>/dev/null
 cd $TARGET_DIR
 mkdir -p /tmp/pdf-cache
 cp -n test/pdfs/*.pdf /tmp/pdf-cache
-
-
-#
-# Run linter
-#
-echo
-echo "========== Running 'make lint'"
-cd $TARGET_DIR
-make lint
 
 
 #
