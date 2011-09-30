@@ -119,7 +119,8 @@ function processNewCommands(){
               output = '\n'+output; // hack to get first line into code below
               output = output.replace(/\n/g, '\n    '); // reformat output as Github/Markdown code
               // Tests passed?
-              if (output.search(/All tests passed/) > -1) {
+              if (output.search(/All tests passed/) > -1 && // 'make test'
+                  output.search(/files checked, no errors found/)) { // 'make lint'
                 github.postEndMessage(cmd, (new Date())-t1, '**All tests passed.**\n\nOutput:\n\n'+output);
               }
               // Tests DID NOT pass
@@ -127,10 +128,10 @@ function processNewCommands(){
                 if (path.existsSync(config.dest_path+'/tests/'+cmd.pull_sha+'/eq.log')) {
                   var url = 'http://'+config.server_host+':'+config.server_port+'/'+cmd.pull_sha+'/reftest-analyzer.xhtml';
                   url += '#web=/'+cmd.pull_sha+'/eq.log';
-                  github.postEndMessage(cmd, (new Date())-t1, '**WARNING: Tests did NOT pass.**\n\nThere was a snapshot difference:\n'+url+'\n\nOutput:\n\n'+output);
+                  github.postEndMessage(cmd, (new Date())-t1, '**WARNING: Some tests did NOT pass.**\n\nThere was a snapshot difference:\n'+url+'\n\nOutput:\n\n'+output);
                 }
                 else {
-                  github.postEndMessage(cmd, (new Date())-t1, '**WARNING: Tests did NOT pass.**\n\nOutput:\n\n'+output);
+                  github.postEndMessage(cmd, (new Date())-t1, '**WARNING: Some tests did NOT pass.**\n\nOutput:\n\n'+output);
                 }
               } // if tests !passed
               console.log((new Date())+': done processing command "'+cmd.command+'" in Pull #'+cmd.pull_number+' from @'+cmd.user+' (id:'+cmd.id+')');

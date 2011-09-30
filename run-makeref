@@ -24,13 +24,14 @@ TARGET_DIR=$TMP_DIR/refs/$SHA
 cd $SCRIPT_DIR
 
 if [ -d $TARGET_DIR ]; then
-  echo 'target dir (' $TARGET_DIR ') already exists - overwriting it...'
   rm -rf $TARGET_DIR
 fi
 
 #
 # Fetch git repo to be used as ref (target), checkout desired sha
 #
+echo
+echo "========== Cloning pull request repo"
 mkdir -p $TARGET_DIR
 cd $TARGET_DIR
 git clone $TARGET_URL .; git checkout --quiet $SHA
@@ -46,6 +47,8 @@ cp -n /tmp/pdf-cache/* test/pdfs
 #
 # Deploy files, make ref set
 #
+echo
+echo "========== Running 'make master'"
 cd $TARGET_DIR
 # Deploy Makefile for master
 cp -f $SCRIPT_DIR/test-files/local.mk . 2>/dev/null
@@ -77,6 +80,8 @@ fi
 #
 # Push up-to-date reference snapshots
 #
+echo
+echo "========== Pushing new snapshots to reference repo"
 mkdir -p $TARGET_DIR/test/ref_repo
 cd $TARGET_DIR/test/ref_repo
 git init; git pull -f $REF_URL

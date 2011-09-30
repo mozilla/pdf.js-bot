@@ -23,10 +23,8 @@ SCRIPT_DIR="$( cd "$( dirname "$0" )" && pwd )"
 mkdir -p $4; cd $4
 TMP_DIR="$( cd "$( dirname "$0" )" && pwd )"
 TARGET_DIR=$TMP_DIR/tests/$SHA
-cd $SCRIPT_DIR
 
 if [ -d $TARGET_DIR ]; then
-  echo 'target dir (' $TARGET_DIR ') already exists - overwriting it...'
   rm -rf $TARGET_DIR
 fi
 
@@ -34,6 +32,8 @@ fi
 #
 # Fetch git repo to be tested (target), checkout desired sha
 #
+echo
+echo "========== Cloning pull request repo"
 mkdir -p $TARGET_DIR
 cd $TARGET_DIR
 git clone $TARGET_URL .; git checkout --quiet $SHA
@@ -42,6 +42,8 @@ git clone $TARGET_URL .; git checkout --quiet $SHA
 #
 # Pull reference snapshots
 #
+echo
+echo "========== Cloning reference images repo"
 mkdir -p $TARGET_DIR/test/ref
 cd $TARGET_DIR/test/ref
 git init; git pull -f $REF_URL
@@ -80,6 +82,8 @@ cp -n /tmp/pdf-cache/* test/pdfs
 #
 # Deploy test/ files, run tests
 #
+echo
+echo "========== Running 'make test'"
 cd $TARGET_DIR
 cp -f $SCRIPT_DIR/test-files/browser_manifest.json ./test/resources/browser_manifests
 cp -f $SCRIPT_DIR/test-files/test_manifest.json ./test 2>/dev/null
@@ -100,9 +104,9 @@ cp -n test/pdfs/*.pdf /tmp/pdf-cache
 #
 # Run linter
 #
+echo
+echo "========== Running 'make lint'"
 cd $TARGET_DIR
-echo 
-echo "Running linter..."
 make lint
 
 
