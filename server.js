@@ -113,7 +113,8 @@ function processNewCommands(){
               pull_url: cmd.pull_url,
               pull_sha: cmd.pull_sha,
               ref_url: 'git://github.com/'+config.ref_repo+'.git',
-              dest_path: config.dest_path
+              dest_path: config.dest_path,
+              timeout: config.process_timeout_mins*60*1000
             }, 
             function(output){
               output = '\n'+output; // hack to get first line into code below
@@ -150,7 +151,8 @@ function processNewCommands(){
               pull_url: cmd.pull_url,
               pull_sha: cmd.pull_sha,
               ref_url: 'git://github.com/'+config.ref_repo+'.git',
-              dest_path: config.dest_path
+              dest_path: config.dest_path,
+              timeout: config.process_timeout_mins*60*1000
             }, 
             function(output){
               output = '\n'+output; // hack to get first line into code below
@@ -162,7 +164,7 @@ function processNewCommands(){
               }
               // Makeref NOT ok
               else {
-                github.postEndMessage(cmd, (new Date())-t1, '**WARNING: Error(s) encountered!**.\n\nOutput:\n\n'+output);
+                github.postEndMessage(cmd, (new Date())-t1, '**WARNING: Error(s) found!**\n\nOutput:\n\n'+output);
               } // if tests !passed
               console.log((new Date())+': done processing command "'+cmd.command+'" in Pull #'+cmd.pull_number+' from @'+cmd.user+' (id:'+cmd.id+')');
 
