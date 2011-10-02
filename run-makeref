@@ -3,11 +3,31 @@
 # Clone source repo to create ref from, create ref
 #
 
+SCRIPT_PID=$$
+
 if [ $# -ne 4 ]; then
   echo 'arguments: <repo_url> <sha> <ref_repo_url> <temp_path>'
   echo
   exit
 fi
+
+#
+# killtree(): Kills all descendant child processes
+#
+killtree() {
+    local _pid=$1
+    local _regex="[ ]*([0-9]+)[ ]+${_pid}"
+    for _child in $(/bin/ps ax -o "pid= ppid=" | grep -E "${_regex}" | sed -E "s/${_regex}/\1/g"); do
+        killtree ${_child}
+    done
+    kill -KILL ${_pid} 1>/dev/null 2>/dev/null
+}
+
+#
+# Runs killtree() upon SIGTERM 
+# NB: trap only works during "wait" or after a command is done
+#
+trap "killtree $SCRIPT_PID" SIGTERM
 
 #
 # Set up vars
@@ -42,7 +62,8 @@ git clone $TARGET_URL .; git checkout --quiet $SHA
 echo
 echo "========== Running 'make lint'"
 cd $TARGET_DIR
-make lint
+make lint &
+wait
 
 
 #
@@ -66,7 +87,8 @@ cp -f $SCRIPT_DIR/test-files/test_manifest.json ./test 2>/dev/null
 cp -f $SCRIPT_DIR/test-files/test.py ./test 2>/dev/null
 cp -f $SCRIPT_DIR/test-files/driver.js ./test 2>/dev/null
 Xvfb :1 1>/dev/null 2>/dev/null &
-make master
+make master &
+wait
 killall -9 Xvfb 1>/dev/null 2>/dev/null
 
 
