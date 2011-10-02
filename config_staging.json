@@ -1,5 +1,5 @@
 {
-  "check_interval": 30,
+  "check_interval_secs": 30,
   "botname": "@pdfjsbot",  
   "main_repo": "arturadib/pdf.js",
   "ref_repo": "arturadib/pdf.js-ref",

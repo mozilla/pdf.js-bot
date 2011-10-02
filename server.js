@@ -47,7 +47,7 @@ setupServer(function(){
   processNewCommands(); // first call
   setInterval(function(){
     processNewCommands();
-  }, config.check_interval*1000);
+  }, config.check_interval_secs*1000);
 });
 
 //
