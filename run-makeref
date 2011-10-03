@@ -113,18 +113,15 @@ cp -n /tmp/pdf-cache/* test/pdfs
 
 
 #
-# Deploy files, make ref set
+# Deploy missing files, make ref set
 #
 echo
 echo "========== Running 'make master'"
 cd $TARGET_DIR
 # Deploy Makefile for master
 cp -f $SCRIPT_DIR/test-files/local.mk . 2>/dev/null
-# Deploy test/ files
+# Deploy missing test/ files
 cp -f $SCRIPT_DIR/test-files/browser_manifest.json ./test/resources/browser_manifests 2>/dev/null
-cp -f $SCRIPT_DIR/test-files/test_manifest.json ./test 2>/dev/null
-cp -f $SCRIPT_DIR/test-files/test.py ./test 2>/dev/null
-cp -f $SCRIPT_DIR/test-files/driver.js ./test 2>/dev/null
 # prepare Xvfb
 Xvfb :1 1>/dev/null 2>/dev/null &
 XVFB_PID=$!

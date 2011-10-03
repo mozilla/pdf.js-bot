@@ -144,7 +144,7 @@ cp -n /tmp/pdf-cache/* test/pdfs
 
 
 #
-# Deploy test/ files, run tests
+# Deploy missing test/ files, run tests
 #
 echo
 echo "========== Running 'make test'"
