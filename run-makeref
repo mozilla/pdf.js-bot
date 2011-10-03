@@ -30,10 +30,10 @@ killtree() {
 }
 
 #
-# Run killtree() upon SIGTERM 
+# Run killtree() upon signal
 # NB: trap only works during "wait" or after a command is done
 #
-trap "killtree $SCRIPT_PID" SIGTERM
+trap "killtree $SCRIPT_PID" SIGTERM SIGINT
 
 #
 # Set up vars
