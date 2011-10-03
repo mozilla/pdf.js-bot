@@ -100,7 +100,8 @@ else
   echo "***"
   echo "WARNING: This pull request contains changes to test-related files in test/."
   echo "         The tests below will thus be performed as per these *new test files*."
-  echo "         Please pay attention to the output below to make sure the new test is kosher."
+  echo "         Someone might have to merge our upstream into this pull request if"
+  echo "         upstream contains important tests not present in this PR."
   echo "***"
 fi
 
