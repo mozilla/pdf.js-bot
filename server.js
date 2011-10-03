@@ -110,6 +110,7 @@ function processNewCommands(){
         case 'test':
           scripts.runTest(
             {
+              main_url: 'git://github.com/'+config.main_repo+'.git',
               pull_url: cmd.pull_url,
               pull_sha: cmd.pull_sha,
               ref_url: 'git://github.com/'+config.ref_repo+'.git',
@@ -148,6 +149,7 @@ function processNewCommands(){
         case 'makeref':
           scripts.runMakeref(
             {
+              main_url: 'git://github.com/'+config.main_repo+'.git',
               pull_url: cmd.pull_url,
               pull_sha: cmd.pull_sha,
               ref_url: 'git://github.com/'+config.ref_repo+'.git',

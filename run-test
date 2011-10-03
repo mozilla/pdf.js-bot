@@ -5,11 +5,17 @@
 
 SCRIPT_PID=$$
 
-if [ $# -ne 4 ]; then
-  echo 'arguments: <repo_url> <sha> <ref_repo_url> <temp_path>'
+if [ $# -ne 5 ]; then
+  echo 'arguments: <main_repo_url> <requester_repo_url> <sha_pull_req> <ref_repo_url> <temp_path>'
   echo
   exit
 fi
+MAIN_URL=$1
+TARGET_URL=$2
+SHA=$3
+REF_URL=$4
+TMP_DIR=$5
+
 
 #
 # killtree(): Kills all descendant child processes
@@ -24,22 +30,18 @@ killtree() {
 }
 
 #
-# Runs killtree() upon SIGTERM 
+# Run killtree() upon SIGTERM 
 # NB: trap only works during "wait" or after a command is done
-#
 trap "killtree $SCRIPT_PID" SIGTERM
 
 
 #
 # Set up vars
 #
-TARGET_URL=$1
-SHA=$2
-REF_URL=$3
 # Get absolute path for current dir
 SCRIPT_DIR="$( cd "$( dirname "$0" )" && pwd )"
 # Hack to get absolute path for tmp path
-mkdir -p $4; cd $4
+mkdir -p $TMP_DIR; cd $TMP_DIR
 TMP_DIR="$( cd "$( dirname "$0" )" && pwd )"
 TARGET_DIR=$TMP_DIR/tests/$SHA
 
@@ -56,16 +58,60 @@ echo "========== Cloning pull request repo"
 mkdir -p $TARGET_DIR
 cd $TARGET_DIR
 git clone $TARGET_URL .; git checkout --quiet $SHA
+if [ $? != 0 ]; then
+  echo
+  echo "***"
+  echo "ERROR: Something went wrong."
+  exit
+fi
+
+
+#
+# Run linter - MUST COME BEFORE OVERWRITING ANY FILES!
+#
+echo
+echo "========== Running 'make lint'"
+cd $TARGET_DIR
+make lint &
+wait $! # so we can trap SIGTERM, see above
+
+
+#
+# Pull test/ from upstream, compare to pull request's
+# If pull request contains changes to test/, use those files
+#
+echo
+echo "========== Fetching test/ from upstream"
+cd $TARGET_DIR
+git remote add upstream $MAIN_URL; git fetch upstream
+TEST_CHANGES="`git diff upstream/master...HEAD --name-only | grep -E '^test/'`"
+if [ -z "$TEST_CHANGES" ]; then
+  echo "No new test/ files in pull request. Using test/ from upstream."
+  git checkout upstream/master test/
+else
+  echo
+  echo "***"
+  echo "WARNING: This pull request contains changes to test-related files in test/."
+  echo "         The tests below will thus be performed as per these *new test files*."
+  echo "         Please pay attention to the output below to make sure the new test is kosher."
+  echo "***"
+fi
 
 
 #
 # Pull reference snapshots
 #
 echo
-echo "========== Cloning reference images repo"
+echo "========== Cloning reference images repo into test/ref/"
 mkdir -p $TARGET_DIR/test/ref
 cd $TARGET_DIR/test/ref
 git init; git pull -f $REF_URL
+if [ $? != 0 ]; then
+  echo
+  echo "***"
+  echo "ERROR: Something went wrong."
+  exit
+fi
 
 
 #
@@ -91,16 +137,6 @@ fi
 
 
 #
-# Run linter - MUST COME BEFORE OVERWRITING ANY test/ FILES!
-#
-echo
-echo "========== Running 'make lint'"
-cd $TARGET_DIR
-make lint &
-wait $! # so we can trap SIGTERM, see above
-
-
-#
 # Copy existing PDFs *from* local cache
 #
 cd $TARGET_DIR
@@ -114,9 +150,6 @@ echo
 echo "========== Running 'make test'"
 cd $TARGET_DIR
 cp -f $SCRIPT_DIR/test-files/browser_manifest.json ./test/resources/browser_manifests
-cp -f $SCRIPT_DIR/test-files/test_manifest.json ./test 2>/dev/null
-cp -f $SCRIPT_DIR/test-files/test.py ./test 2>/dev/null
-cp -f $SCRIPT_DIR/test-files/driver.js ./test 2>/dev/null
 # prepare Xvfb
 Xvfb :1 1>/dev/null 2>/dev/null &
 XVFB_PID=$!
@@ -144,3 +177,6 @@ cd $TARGET_DIR
 mv -f test/eq.log . 2>/dev/null
 mv -f test/resources/reftest-analyzer.xhtml . 2>/dev/null
 find . ! -iname 'eq.log' -and ! -iname 'reftest-analyzer.xhtml' -delete
+
+echo
+echo "All done."
