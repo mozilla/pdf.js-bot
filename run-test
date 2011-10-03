@@ -97,7 +97,7 @@ echo
 echo "========== Running 'make lint'"
 cd $TARGET_DIR
 make lint &
-wait
+wait $! # so we can trap SIGTERM, see above
 
 
 #
@@ -117,10 +117,14 @@ cp -f $SCRIPT_DIR/test-files/browser_manifest.json ./test/resources/browser_mani
 cp -f $SCRIPT_DIR/test-files/test_manifest.json ./test 2>/dev/null
 cp -f $SCRIPT_DIR/test-files/test.py ./test 2>/dev/null
 cp -f $SCRIPT_DIR/test-files/driver.js ./test 2>/dev/null
+# prepare Xvfb
 Xvfb :1 1>/dev/null 2>/dev/null &
+XVFB_PID=$!
+# make test
 make test &
-wait
-killall -9 Xvfb 1>/dev/null 2>/dev/null
+wait $! # so we can trap SIGTERM, see above
+# kill Xvfb
+kill -9 $XVFB_PID 1>/dev/null 2>/dev/null
 
 
 #
@@ -134,6 +138,8 @@ cp -n test/pdfs/*.pdf /tmp/pdf-cache
 #
 # Erase everything but eq.log and reftest-analyzer
 #
+echo
+echo "========== Cleaning up"
 cd $TARGET_DIR
 mv -f test/eq.log . 2>/dev/null
 mv -f test/resources/reftest-analyzer.xhtml . 2>/dev/null

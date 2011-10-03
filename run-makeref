@@ -63,7 +63,7 @@ echo
 echo "========== Running 'make lint'"
 cd $TARGET_DIR
 make lint &
-wait
+wait $!
 
 
 #
@@ -86,10 +86,14 @@ cp -f $SCRIPT_DIR/test-files/browser_manifest.json ./test/resources/browser_mani
 cp -f $SCRIPT_DIR/test-files/test_manifest.json ./test 2>/dev/null
 cp -f $SCRIPT_DIR/test-files/test.py ./test 2>/dev/null
 cp -f $SCRIPT_DIR/test-files/driver.js ./test 2>/dev/null
+# prepare Xvfb
 Xvfb :1 1>/dev/null 2>/dev/null &
+XVFB_PID=$!
+# make test
 make master &
-wait
-killall -9 Xvfb 1>/dev/null 2>/dev/null
+wait $!
+# kill Xvfb
+kill -9 $XVFB_PID 1>/dev/null 2>/dev/null
 
 
 #
@@ -126,4 +130,6 @@ echo sha $SHA >> REF-INFO
 #
 # Erase everything
 #
+echo
+echo "========== Cleaning up"
 rm -rf $TARGET_DIR
