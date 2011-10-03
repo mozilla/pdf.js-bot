@@ -5,5 +5,5 @@
   "ref_repo": "arturadib/pdf.js-ref",
   "dest_path": "./tmp",
   "server_port": 8989,
-  "process_timeout_mins": 1
+  "process_timeout_mins": 30
 }
