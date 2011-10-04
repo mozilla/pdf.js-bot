@@ -3,19 +3,32 @@
 This bot is used by pdf.js reviewers to run regression tests. The bot lives in `server.js` and requires node.js. See instructions below on how to set it up.
 
 
-## Reviewer workflow
+## Getting started
 
-**Performing regression test**
+To issue bot requests use the commands below as comments in open pull requests (PR). Here's an example:
 
-1. User submits pull request to main repo
-2. Reviewer leaves comment `@pdfjsbot test`
-3. `@pdfjsbot` clones repo of requester; checks out top SHA of pull request; pulls `pdf.js-ref` repo containing snapshots; runs `make test` in requester repo; and comments back with the results of test
++ https://github.com/andreasgal/pdf.js/pull/603
 
-**Generating reference snapshots**
+Note that the bot only listens for commands from repo collaborators (auto-whitelist). Currently our tests are taking approximately **25-30 mins** (including our very long pdf.pdf test file), and we've implemented a 60-min timeout for tests that for some reason hang.
 
-1. User submits pull request to main repo containing new features
-1. Reviewer leaves comment `@pdfjsbot makeref`
-2. `@pdfjsbot` clones repo of requester; checks out top SHA of pull request; runs `make master` in requester repo; and (force-)pushes snapshots to `pdf.js-ref` repo
++ `@pdfjsbot test` : This will run the full suite of tests on the PR, including image comparison tests against the reference repo at `arturadib/pdf.js-ref`. In case there are any image differences, a URL/link will be provided in a comment to the pull request to allow reviewers and requesters to inspect the images and their differences.
+
++ `@pdfjsbot makeref` : This will generate reference images using the pull request source code and push the resulting images to the reference repo. Note that THIS WILL OVERWRITE any existing images, so only do this if you definitely approve all the visual changes introduced in the PR.
+
+
+## The nitty-gritty:
+
+Here are a few things you might want to know, might have to know in the near future when certain WARNING flags come up, or might never need to know simply because you're so lucky and things just work for you!
+
++ **Commands are run in a queue** : The bot currently doesn't support concurrent tests. Your order in the queue is reported by the bot upon command recognition.
+
++ **By default, test files come from upstream** : To ensure we are always testing new code against the latest and most comprehensive regression tests, by default the bot checks out `test/` from upstream into the PR clone. The exception is when the pull request itself has new/modified files in `test/`, in which case the bot uses `test/` files from the PR and issues a WARNING explaining it's not using upstream for tests. (This fallback is in place to allow PRs to introduce new tests).
+
+    If there's any suspicion that the PR tests will miss important tests from upstream, the reviewer should ask the requester to merge upstream into the PR branch, and run the test again.
+
++ **Reference images are not versioned** : Because of their size we don't version our images repo. This means that a pull request might get compared against images with new features that are not present in the requester's branch. In this case the bot will issue a WARNING explaining the situation.
+
+    If the tests pass, it shouldn't be a problem. If they don't, the reviewer should ask the requester to merge upstream into their PR and try again, as the regression might be due to a missing commit.
 
 
 ## Troubleshooting
