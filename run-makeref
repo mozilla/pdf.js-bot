@@ -90,7 +90,7 @@ fi
 echo
 echo "========== Fetching test/ from upstream"
 cd $TARGET_DIR
-git remote add upstream $MAIN_URL; git fetch upstream
+git remote add upstream $MAIN_URL; git fetch --quiet upstream
 TEST_CHANGES="`git diff upstream/master...HEAD --name-only | grep -E '^test/'`"
 if [ -z "$TEST_CHANGES" ]; then
   echo "No new test/ files in pull request. Using test/ from upstream."
@@ -162,7 +162,7 @@ echo
 echo "========== Pushing new snapshots to reference repo"
 mkdir -p $TARGET_DIR/test/ref_repo
 cd $TARGET_DIR/test/ref_repo
-git init; git pull -f $REF_URL
+git init; git pull -f --quiet $REF_URL
 cp -Rf ../tmp/* .
 # generate REF-INFO
 echo url $TARGET_URL > REF-INFO

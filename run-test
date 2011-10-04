@@ -83,7 +83,7 @@ wait $! # so we can trap SIGTERM, see above
 echo
 echo "========== Fetching test/ from upstream"
 cd $TARGET_DIR
-git remote add upstream $MAIN_URL; git fetch upstream
+git remote add upstream $MAIN_URL; git fetch --quiet upstream
 TEST_CHANGES="`git diff upstream/master...HEAD --name-only | grep -E '^test/'`"
 if [ -z "$TEST_CHANGES" ]; then
   echo "No new test/ files in pull request. Using test/ from upstream."
@@ -106,7 +106,7 @@ echo
 echo "========== Cloning reference images repo into test/ref/"
 mkdir -p $TARGET_DIR/test/ref
 cd $TARGET_DIR/test/ref
-git init; git pull -f $REF_URL
+git init; git pull -f --quiet $REF_URL
 if [ $? != 0 ]; then
   echo
   echo "***"
