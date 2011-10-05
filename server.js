@@ -135,7 +135,7 @@ function processNewCommands(){
               else {
                 if (path.existsSync(config.dest_path+'/tests/'+cmd.pull_sha+'/eq.log')) {
                   var url = 'http://'+config.server_host+':'+config.server_port+'/tests/'+cmd.pull_sha+'/reftest-analyzer.xhtml';
-                  url += '#web=/'+cmd.pull_sha+'/eq.log';
+                  url += '#web=/tests/'+cmd.pull_sha+'/eq.log';
                   github.postEndMessage(cmd, (new Date())-t1, '**ERROR: Some tests did NOT pass.**\n\nThere was a _snapshot difference:_\n'+url+'\n\nOutput:\n\n'+output);
                 }
                 else {

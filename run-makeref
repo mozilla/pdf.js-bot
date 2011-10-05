@@ -90,7 +90,7 @@ wait $!
 if [ $? != 0 ]; then
   echo
   echo "***"
-  echo "ERROR: Something went wrong."
+  echo "ERROR: Lint didn't pass."
   exit
 fi
 
