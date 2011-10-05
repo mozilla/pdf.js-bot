@@ -123,17 +123,17 @@ cp -n /tmp/pdf-cache/* test/pdfs
 # Deploy missing files, make ref set
 #
 echo
-echo "========== Running 'make master'"
+echo "========== Running 'make bot_master'"
 cd $TARGET_DIR
-# Deploy Makefile for master
+# Deploy Makefile for bot_master
 cp -f $SCRIPT_DIR/test-files/local.mk . 2>/dev/null
 # Deploy missing test/ files
 cp -f $SCRIPT_DIR/test-files/browser_manifest.json ./test/resources/browser_manifests 2>/dev/null
 # prepare Xvfb
 Xvfb :1 1>/dev/null 2>/dev/null &
 XVFB_PID=$!
-# make test
-make master &
+# make bot_master
+make bot_master &
 wait $!
 if [ $? != 0 ]; then
   echo

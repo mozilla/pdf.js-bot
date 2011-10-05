@@ -154,14 +154,17 @@ cp -n /tmp/pdf-cache/* test/pdfs
 # Deploy missing test/ files, run tests
 #
 echo
-echo "========== Running 'make test'"
+echo "========== Running 'make bot_test'"
 cd $TARGET_DIR
-cp -f $SCRIPT_DIR/test-files/browser_manifest.json ./test/resources/browser_manifests
+# Deploy Makefile for bot_test
+cp -f $SCRIPT_DIR/test-files/local.mk . 2>/dev/null
+# Deploy missing test/ files
+cp -f $SCRIPT_DIR/test-files/browser_manifest.json ./test/resources/browser_manifests 2>/dev/null
 # prepare Xvfb
 Xvfb :1 1>/dev/null 2>/dev/null &
 XVFB_PID=$!
-# make test
-make test &
+# make bot_test
+make bot_test &
 wait $! # so we can trap SIGTERM, see above
 # kill Xvfb
 kill -9 $XVFB_PID 1>/dev/null 2>/dev/null
