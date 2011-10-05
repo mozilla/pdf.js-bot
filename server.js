@@ -57,9 +57,9 @@ function setupServer(callback){
   // HTTP server
   app.use(express.bodyParser());
   app.use(app.router);
-  app.use(express.static(__dirname+'/'+config.dest_path+'/tests'));
+  app.use(express.static(__dirname+'/'+config.dest_path));
   app.listen(config.server_port);
-  console.log((new Date())+': HTTP server listening on port '+config.server_port+', serving dir '+config.dest_path+'/tests');
+  console.log((new Date())+': HTTP server listening on port '+config.server_port+', serving dir '+config.dest_path);
 
   getPublicIP(function(){        
     // Github-specific
@@ -94,7 +94,8 @@ function processNewCommands(){
     var t1 = new Date();
     
     console.log((new Date())+': processing new command "'+cmd.command+'" in Pull #'+cmd.pull_number+' from @'+cmd.user+' (id:'+cmd.id+'), queue size: '+queue.size());    
-    github.postStartMessage(cmd, 'Processing command **'+(cmd.command||'(empty)')+'** by user _'+cmd.user+'_. Queue size: '+queue.size());
+    github.postStartMessage(cmd, 'Processing command **'+(cmd.command||'(empty)')+'** by user _'+cmd.user+'_. Queue size: '+queue.size()+'\n\n'+
+                                 'Live script output is available at: '+'http://'+config.server_host+':'+config.server_port+'/'+cmd.pull_sha+'.txt');
     
     //
     // Process each command in queue
@@ -133,7 +134,7 @@ function processNewCommands(){
               // Tests DID NOT pass
               else {
                 if (path.existsSync(config.dest_path+'/tests/'+cmd.pull_sha+'/eq.log')) {
-                  var url = 'http://'+config.server_host+':'+config.server_port+'/'+cmd.pull_sha+'/reftest-analyzer.xhtml';
+                  var url = 'http://'+config.server_host+':'+config.server_port+'/tests/'+cmd.pull_sha+'/reftest-analyzer.xhtml';
                   url += '#web=/'+cmd.pull_sha+'/eq.log';
                   github.postEndMessage(cmd, (new Date())-t1, '**ERROR: Some tests did NOT pass.**\n\nThere was a _snapshot difference:_\n'+url+'\n\nOutput:\n\n'+output);
                 }
