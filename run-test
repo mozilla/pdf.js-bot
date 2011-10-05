@@ -63,11 +63,18 @@ echo
 echo "========== Cloning pull request repo"
 mkdir -p $TARGET_DIR
 cd $TARGET_DIR
-git clone $TARGET_URL .; git checkout --quiet $SHA
+git clone $TARGET_URL .
 if [ $? != 0 ]; then
   echo
   echo "***"
-  echo "ERROR: Something went wrong."
+  echo "ERROR: Could not clone $TARGET_URL"
+  exit
+fi
+git checkout --quiet $SHA
+if [ $? != 0 ]; then
+  echo
+  echo "***"
+  echo "ERROR: Could not checkout sha $SHA"
   exit
 fi
 
