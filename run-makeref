@@ -154,7 +154,7 @@ if [ -z "$COMMIT_EXISTS" ]; then # is COMMIT_EXISTS zero-length? (i.e. no match)
   echo
   echo "       Please merge the master branch from the main repo into this pull request"
   echo "       and try again."
-  echo "******************************************************************************"
+  echo
   echo "Commit used to create snapshots (REF-INFO file from reference repo):"
   cat $TARGET_DIR/test/ref/REF-INFO
   echo "******************************************************************************"
