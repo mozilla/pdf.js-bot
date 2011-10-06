@@ -122,26 +122,35 @@ function processNewCommands(){
               var msg = '';
               output = '\n'+output; // hack to get first line into code below
               output = output.replace(/\n/g, '\n    '); // reformat output as Github/Markdown code
+              
               // Tests passed?
               if (output.search("All tests passed") > -1 && // 'make test'
                   output.search("files checked, no errors found") > -1) { // 'make lint'
-                msg += '**All tests passed.**\n\n';
-                if (output.search("WARNING") > -1) 
-                  msg += '**WARNING:** Some WARNING messages found! Make sure to _read them_ :).\n\n';
-                msg += 'Output:\n\n'+output
-                github.postEndMessage(cmd, (new Date())-t1, msg);
+                                  
+                if (output.search("WARNING") < 0) {
+                  msg = '**All tests passed.**';
+                }
+                else {
+                  msg = '**All tests passed,** but with **WARNING(s)**.';
+                  msg += '\n\nMake sure to _read them!_ :).';
+                }
               }
               // Tests DID NOT pass
               else {
+
+                msg = '**ERROR(s) found**';
+
                 if (path.existsSync(config.dest_path+'/tests/'+cmd.pull_sha+'/eq.log')) {
-                  var url = 'http://'+config.server_host+':'+config.server_port+'/tests/'+cmd.pull_sha+'/reftest-analyzer.xhtml';
-                  url += '#web=/tests/'+cmd.pull_sha+'/eq.log';
-                  github.postEndMessage(cmd, (new Date())-t1, '**ERROR: Some tests did NOT pass.**\n\nThere was a _snapshot difference:_\n'+url+'\n\nOutput:\n\n'+output);
+                  
+                  var url = 'http://'+config.server_host+':'+config.server_port+'/tests/'+cmd.pull_sha+'/reftest-analyzer.xhtml'+
+                            '#web=/tests/'+cmd.pull_sha+'/eq.log';
+                  msg += '\n\n**ATTENTION:** There was a _snapshot difference:_\n'+url;
+
                 }
-                else {
-                  github.postEndMessage(cmd, (new Date())-t1, '**ERROR: Some tests did NOT pass.**\n\nOutput:\n\n'+output);
-                }
-              } // if tests !passed
+              } // if !tests passed
+
+              msg += '\n\nOutput:\n\n'+output              
+              github.postEndMessage(cmd, (new Date())-t1, msg);
               console.log((new Date())+': done processing command "'+cmd.command+'" in Pull #'+cmd.pull_number+' from @'+cmd.user+' (id:'+cmd.id+')');
             
               queue.next();
@@ -166,19 +175,26 @@ function processNewCommands(){
               var msg = '';
               output = '\n'+output; // hack to get first line into code below
               output = output.replace(/\n/g, '\n    '); // reformat output as Github/Markdown code
+              
               // Makeref OK?
               if (output.search("All tests passed") > -1 && // 'make test'
                   output.search("files checked, no errors found") > -1) { // 'make lint'
-                msg += '**References generated** and pushed to `'+config.ref_repo+'`.\n\n';
+                
+                msg = '**References generated**';
+                msg += '\n\nImages pushed to `'+config.ref_repo+'`';
                 if (output.search("WARNING") > -1) 
-                  msg += '**WARNING:** Some WARNING messages found! Make sure to _read them_ :).\n\n';
-                msg += 'Output:\n\n'+output
-                github.postEndMessage(cmd, (new Date())-t1, msg);
+                  msg += '\n\n**WARNING:** Some WARNING messages found! Make sure to _read them_ :)';
+
               }
               // Makeref NOT ok
               else {
-                github.postEndMessage(cmd, (new Date())-t1, '**ERROR: Error(s) found!**\n\nOutput:\n\n'+output);
-              } // if tests !passed
+                
+                msg = '**ERROR(s) found!**';
+
+              }; // if tests !passed
+
+              msg += '\n\nOutput:\n\n'+output
+              github.postEndMessage(cmd, (new Date())-t1, msg);
               console.log((new Date())+': done processing command "'+cmd.command+'" in Pull #'+cmd.pull_number+' from @'+cmd.user+' (id:'+cmd.id+')');
 
               queue.next();
