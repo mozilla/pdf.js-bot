@@ -3,7 +3,7 @@
   "botname": "@pdfjsbot",  
   "main_repo": "andreasgal/pdf.js",
   "ref_repo": "arturadib/pdf.js-ref",
-  "dest_path": "./tmp",
+  "tmp_path": "./tmp",
   "server_port": 8989,
   "process_timeout_mins": 60
 }
