@@ -20,7 +20,7 @@ TMP_DIR=$5
 # Make sure there are no stray processes running
 #
 if [ -z "$PDFJSBOT_STAGING" ]; then
-  echo "========== Killing stray processes"  
+  echo "========== Killing any stray processes"
   ps ax -o "pid command" | grep -v 'grep' | grep -E -i 'test.py' | sed -E 's/([0-9]+) .+/\1/g' | xargs kill -TERM 1>/dev/null 2>/dev/null
   ps ax -o "pid comm" | grep -E -i 'firefox' | sed -E 's/([0-9]+) .+/\1/g' | xargs kill -9 1>/dev/null 2>/dev/null
 fi
