@@ -224,7 +224,8 @@ function processNewCommands(){
 // runScript()
 //
 function runScript(args, callback){
-  var outputFile = args.tmp_path+'/'+args.output_file,
+  var child,
+      outputFile = args.tmp_path+'/'+args.output_file,
       script = './run-'+args.script,
       cmd = 'mkdir -p '+args.tmp_path+'; '+
             script+' '+args.main_url+' '+args.pull_url+' '+args.pull_sha+' '+args.ref_url+' '+args.tmp_path+
@@ -235,7 +236,7 @@ function runScript(args, callback){
   //
   // Launch process
   //
-  exec(cmd, 
+  child = exec(cmd, 
     {
       timeout: args.timeout || undefined
     },
@@ -244,6 +245,7 @@ function runScript(args, callback){
       // Script done
       //
       if (error && error.killed) {
+        exec('kill -TERM '+child.pid); // just in case Node messed up
         stdout += '\n\n***\nProcess killed (timeout).\n';
       }
       if (callback) callback(stdout+'\n\n_____________________________ stderr:\n\n'+stderr);
