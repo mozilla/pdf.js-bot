@@ -11,7 +11,7 @@ To issue bot requests use the commands below as comments in open pull requests (
 
 Note that the bot only listens for commands from repo collaborators (auto-whitelist). Currently our tests are taking approximately **25-30 mins** (including our very long pdf.pdf test file), and we've implemented a 60-min timeout for tests that for some reason hang.
 
-+ `@pdfjsbot test` : This will run the full suite of tests on the PR, including image comparison tests against the reference repo at `arturadib/pdf.js-ref`. In case there are any image differences, a URL/link will be provided in a comment to the pull request to allow reviewers and requesters to inspect the images and their differences.
++ `@pdfjsbot test` : This will run the full suite of tests on the PR, including image comparison tests against the reference repo. In case there are any image differences, a URL/link will be provided in a comment to the pull request to allow reviewers and requesters to inspect the images and their differences.
 
 + `@pdfjsbot makeref` : This will generate reference images using the pull request source code and push the resulting images to the reference repo. Note that THIS WILL OVERWRITE any existing images, so only do this if you definitely approve all the visual changes introduced in the PR.
 

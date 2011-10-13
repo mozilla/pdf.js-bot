@@ -116,7 +116,7 @@ function processNewCommands(){
               main_url: 'git://github.com/'+config.main_repo+'.git',
               pull_url: cmd.pull_url,
               pull_sha: cmd.pull_sha,
-              ref_url: 'git://github.com/'+config.ref_repo+'.git',
+              ref_url: config.ref_repo,
               tmp_path: config.tmp_path,
               timeout: config.process_timeout_mins*60*1000,
               output_file: liveOutputFile
@@ -169,7 +169,7 @@ function processNewCommands(){
               main_url: 'git://github.com/'+config.main_repo+'.git',
               pull_url: cmd.pull_url,
               pull_sha: cmd.pull_sha,
-              ref_url: 'git://github.com/'+config.ref_repo+'.git',
+              ref_url: config.ref_repo,
               tmp_path: config.tmp_path,
               timeout: config.process_timeout_mins*60*1000,
               output_file: liveOutputFile              
