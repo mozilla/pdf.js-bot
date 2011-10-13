@@ -100,27 +100,19 @@ if [ $? != 0 ]; then
 fi
 
 
-
 #
-# Pull test/ from upstream, compare to pull request's
-# If pull request contains changes to test/, use those files
+# Merge upstream into pull request
 #
 echo
-echo "========== Fetching test/ from upstream"
+echo "========== Merging upstream into pull request clone"
 cd $TARGET_DIR
-git remote add upstream $MAIN_URL; git fetch --quiet upstream
-TEST_CHANGES="`git diff upstream/master...HEAD --name-only | grep -E '^test/'`"
-if [ -z "$TEST_CHANGES" ]; then
-  echo "No new test/ files in pull request. Using test/ from upstream."
-  git checkout upstream/master test/
-else
+git pull --quiet $MAIN_URL master
+if [ $? != 0 ]; then
   echo
   echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-  echo "WARNING: This pull request contains changes to test-related files in test/."
-  echo "         The tests below will thus be performed as per these *new test files*."
-  echo "         If upstream contains important tests not present in this PR, someone"
-  echo "         will have to merge it here and run the tests again."
+  echo "ERROR: Could not merge upstream into pull request. Please resolve conflicts."
   echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+  exit
 fi
 
 
@@ -142,20 +134,21 @@ fi
 
 
 #
-# Check if commit/SHA used to generate previous snapshots is present in target history
+# Check if commit/SHA used to generate previous snapshots is present in history
 #
+echo
+echo "========== Checking for consistency with reference repo"
 cd $TARGET_DIR/test/ref
 ORIGINAL_SHA=`grep 'sha' REF-INFO | sed -e 's/sha \([0-9a-z]*\)/\1/g'` # get SHA from REF-INFO
 COMMIT_EXISTS=`cd $TARGET_DIR; git log --format="%H" | grep $ORIGINAL_SHA` # ask git if SHA exists in index
 if [ -z "$COMMIT_EXISTS" ]; then # is COMMIT_EXISTS zero-length? (i.e. no match)
   echo
   echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-  echo "ERROR: This pull request does not contain the commit used to generate the"
-  echo "       *previous* reference images."
+  echo "ERROR: Could not find commit used to generate the *previous* reference images"
+  echo "       in history."
   echo "       Generating a new set from here can thus cause an unintended regression."
   echo
-  echo "       Please merge the master branch from the main repo into this pull request"
-  echo "       and try again."
+  echo "       Please merge the missing pull request into upstream and try again."
   echo
   echo "Commit used to create snapshots (REF-INFO file from reference repo):"
   cat $TARGET_DIR/test/ref/REF-INFO

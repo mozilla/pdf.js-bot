@@ -94,25 +94,18 @@ wait $! # so we can trap SIGTERM, see above
 
 
 #
-# Pull test/ from upstream, compare to pull request's
-# If pull request contains changes to test/, use those files
+# Merge upstream into pull request
 #
 echo
-echo "========== Fetching test/ from upstream"
+echo "========== Merging upstream into pull request clone"
 cd $TARGET_DIR
-git remote add upstream $MAIN_URL; git fetch --quiet upstream
-TEST_CHANGES="`git diff upstream/master...HEAD --name-only | grep -E '^test/'`"
-if [ -z "$TEST_CHANGES" ]; then
-  echo "No new test/ files in pull request. Using test/ from upstream."
-  git checkout upstream/master test/
-else
+git pull --quiet $MAIN_URL master
+if [ $? != 0 ]; then
   echo
   echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-  echo "WARNING: This pull request contains changes to test-related files in test/."
-  echo "         The tests below will thus be performed as per these *new test files*."
-  echo "         If upstream contains important tests not present in this PR, someone"
-  echo "         will have to merge it here and run the tests again."
+  echo "ERROR: Could not merge upstream into pull request. Please resolve conflicts."
   echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+  exit
 fi
 
 
@@ -134,21 +127,21 @@ fi
 
 
 #
-# Check if commit/SHA used to generate snapshots is present in target history
-# and issue WARNING if not present
+# Check if commit/SHA used to generate snapshots is present in history
+# and issue WARNING if not
 #
+echo
+echo "========== Checking for consistency with reference repo"
 cd $TARGET_DIR/test/ref
 ORIGINAL_SHA=`grep 'sha' REF-INFO | sed -e 's/sha \([0-9a-z]*\)/\1/g'` # get SHA from REF-INFO
 COMMIT_EXISTS=`cd $TARGET_DIR; git log --format="%H" | grep $ORIGINAL_SHA` # ask git if SHA exists in index
 if [ -z "$COMMIT_EXISTS" ]; then # is COMMIT_EXISTS zero-length? (i.e. no match)
   echo
   echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-  echo "WARNING: This pull request does not contain the commit used to generate "
-  echo "         reference images."
-  echo "         If the tests all pass, that should be OK."
-  echo "         If not, it could be because of a missing feature in this pull request."
-  echo "         Try merging the master branch from the main repo into this PR,"
-  echo "         and issuing another test."
+  echo "WARNING: Could not find commit that generated reference images in history."
+  echo "         Someone must have forgotten to merge a reference pull request into"
+  echo "         upstream."
+  echo "         If the tests all pass, that should be OK though."
   echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
   echo "Commit used to create snapshots (REF-INFO file from reference repo):"
   cat $TARGET_DIR/test/ref/REF-INFO
