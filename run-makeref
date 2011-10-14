@@ -225,8 +225,8 @@ echo sha $SHA >> REF-INFO
 # refreshing the local cache
 pushd .
 cd $REF_URL
-git fetch origin
-git merge master
+rm -fr .git/
+git init; git pull -f --quiet git@github.com:arturadib/pdf.js-ref.git
 popd
 
 #
