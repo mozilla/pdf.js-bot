@@ -222,7 +222,11 @@ echo url $TARGET_URL > REF-INFO
 echo sha $SHA >> REF-INFO
 # push
 ./commit-push-clean
-
+# refreshing the local cache
+pushd .
+cd $REF_URL
+git fetch origin
+popd
 
 #
 # Erase everything
