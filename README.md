@@ -108,13 +108,15 @@ The instructions below assume we'll be deploying on **Ubuntu 11.04**. See http:/
 
 **Bot**
 
-1. Clone repo into home dir: `$ git clone <pdf.js-bot-URL>`
+1. Clone repo into home dir: `$ cd ~; git clone <pdf.js-bot-URL>`
 1. Install required node packages: `$ cd pdf.js-bot; npm install`
 1. Configure browser manifest file: `test-files/browser_manifest.json`
+1. (If using a local reference repo, i.e. not on Github) Initialize bare reference repo: `$ cd ~; git init --bare ./pdf.js-ref`
 
 **Launch: Production**
 
 1. Check if default parameters are OK: `config.json`
+1. Check in particular the _repo locations_ in `config.json`
 1. Start bot with `$ forever start -o /tmp/bot.log server.js`
 1. (You can stop server with `$ forever stop 0`)
 

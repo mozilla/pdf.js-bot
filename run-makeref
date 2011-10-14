@@ -139,22 +139,28 @@ fi
 echo
 echo "========== Checking for consistency with reference repo"
 cd $TARGET_DIR/test/ref
-ORIGINAL_SHA=`grep 'sha' REF-INFO | sed -e 's/sha \([0-9a-z]*\)/\1/g'` # get SHA from REF-INFO
-COMMIT_EXISTS=`cd $TARGET_DIR; git log --format="%H" | grep $ORIGINAL_SHA` # ask git if SHA exists in index
-if [ -z "$COMMIT_EXISTS" ]; then # is COMMIT_EXISTS zero-length? (i.e. no match)
-  echo
-  echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-  echo "ERROR: Could not find commit used to generate the *previous* reference images"
-  echo "       in history."
-  echo "       Generating a new set from here can thus cause an unintended regression."
-  echo
-  echo "       Please merge the missing pull request into upstream and try again."
-  echo
-  echo "Commit used to create snapshots (REF-INFO file from reference repo):"
-  cat $TARGET_DIR/test/ref/REF-INFO
-  echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-  exit
+if [ -f REF-INFO ]; then
+  ORIGINAL_SHA=`grep 'sha' REF-INFO | sed -e 's/sha \([0-9a-z]*\)/\1/g'` # get SHA from REF-INFO
+  COMMIT_EXISTS=`cd $TARGET_DIR; git log --format="%H" | grep $ORIGINAL_SHA` # ask git if SHA exists in index
+  if [ -z "$COMMIT_EXISTS" ]; then # is COMMIT_EXISTS zero-length? (i.e. no match)
+    echo
+    echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+    echo "ERROR: Could not find commit used to generate the *previous* reference images"
+    echo "       in history."
+    echo "       Generating a new set from here can thus cause an unintended regression."
+    echo
+    echo "       Please merge the missing pull request into upstream and try again."
+    echo
+    echo "Commit used to create snapshots (REF-INFO file from reference repo):"
+    cat $TARGET_DIR/test/ref/REF-INFO
+    echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+    exit
+  fi
 fi
+
+#
+# We don't need the previous reference snapshots anymore
+#
 rm -rf $TARGET_DIR/test/ref 1>/dev/null 2>/dev/null
 
 #
@@ -216,18 +222,22 @@ echo "========== Pushing new snapshots to reference repo"
 mkdir -p $TARGET_DIR/test/ref_repo
 cd $TARGET_DIR/test/ref_repo
 git init; git pull -f --quiet $REF_URL
-cp -Rf ../tmp/* .
+cp -Rf $TARGET_DIR/test/tmp/* .
 # generate REF-INFO
 echo url $TARGET_URL > REF-INFO
 echo sha $SHA >> REF-INFO
-# push
-./commit-push-clean
-# refreshing the local cache
-pushd .
-cd $REF_URL
-rm -fr .git/
-git init; git pull -f --quiet git@github.com:arturadib/pdf.js-ref.git
-popd
+# push a clean repo from scratch
+rm -rf .git
+git init; git add .; git commit -m 'Overriding repo contents' 1>/dev/null 2>/dev/null
+git push -f $REF_URL master
+if [ $? != 0 ]; then
+  echo
+  echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+  echo "ERROR: Could not push to reference repo."
+  echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+  exit
+fi
+
 
 #
 # Erase everything
