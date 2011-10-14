@@ -156,12 +156,16 @@ if [ -f REF-INFO ]; then
     echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
     exit
   fi
+else
+  echo "Previous reference repo was EMPTY. Moving on..."
 fi
+
 
 #
 # We don't need the previous reference snapshots anymore
 #
 rm -rf $TARGET_DIR/test/ref 1>/dev/null 2>/dev/null
+
 
 #
 # Copy existing PDFs *from* local cache
