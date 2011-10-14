@@ -226,6 +226,7 @@ echo sha $SHA >> REF-INFO
 pushd .
 cd $REF_URL
 git fetch origin
+git merge master
 popd
 
 #
