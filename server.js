@@ -96,7 +96,7 @@ function processNewCommands(){
     
     console.log((new Date())+': processing new command "'+cmd.command+'" in Pull #'+cmd.pull_number+' from @'+cmd.user+' (id:'+cmd.id+'), queue size: '+queue.size());    
     github.postStartMessage(cmd, 'Processing command **'+(cmd.command||'(empty)')+'** by user _'+cmd.user+'_. Queue size: '+queue.size()+'\n\n'+
-                                 'Live script output is available at: '+config.server_url+'/'+liveOutputFile);
+                                 'Live script output is available (after queueing is done) at: '+config.server_url+'/'+liveOutputFile);
     
     //
     // Process each command in queue
