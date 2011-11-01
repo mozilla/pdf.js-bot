@@ -7,7 +7,7 @@ This bot is used by pdf.js reviewers to run regression tests. The bot lives in `
 
 To issue bot requests use the commands below as comments in open pull requests (PR). Here's an example:
 
-+ https://github.com/andreasgal/pdf.js/pull/603
++ https://github.com/mozilla/pdf.js/pull/603
 
 Note that the bot only listens for commands from repo collaborators (auto-whitelist). Currently our tests are taking approximately **25-30 mins** (including our very long pdf.pdf test file), and we've implemented a 60-min timeout for tests that for some reason hang.
 

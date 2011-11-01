@@ -1,7 +1,7 @@
 {
   "check_interval_secs": 30,
   "botname": "@pdfjsbot",  
-  "main_repo": "andreasgal/pdf.js",
+  "main_repo": "mozilla/pdf.js",
   "ref_repo": "/home/ubuntu/pdf.js-ref",
   "tmp_path": "./tmp",
   "server_port": 8989,
