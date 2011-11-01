@@ -1,6 +1,6 @@
 #!/bin/bash
 
-git pull
+git pull origin master
 forever stop 0
 forever start -o /tmp/bot.log -l /tmp/forever.log --append server.js
 
