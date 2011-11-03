@@ -187,7 +187,6 @@ cp -f $SCRIPT_DIR/test-files/browser_manifest.json ./test/resources/browser_mani
 # prepare Xvfb
 Xvfb :1 1>/dev/null 2>/dev/null &
 XVFB_PID=$!
-# make bot_master
 make bot_master &
 wait $!
 if [ $? != 0 ]; then
@@ -209,10 +208,10 @@ mkdir -p /tmp/pdf-cache
 cp -n test/pdfs/*.pdf /tmp/pdf-cache
 
 
-if [ ! -d $TARGET_DIR/test/tmp ]; then
+if [ ! -d $TARGET_DIR/test/ref ]; then
   echo
   echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-  echo "ERROR (run-makeref): Could not find test/tmp snapshots!"
+  echo "ERROR (run-makeref): Could not find test/ref snapshots!"
   echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
   exit
 fi
@@ -226,7 +225,7 @@ echo "========== Pushing new snapshots to reference repo"
 mkdir -p $TARGET_DIR/test/ref_repo
 cd $TARGET_DIR/test/ref_repo
 git init; git pull -f --quiet $REF_URL
-cp -Rf $TARGET_DIR/test/tmp/* .
+cp -Rf $TARGET_DIR/test/ref/* .
 # generate REF-INFO
 echo url $TARGET_URL > REF-INFO
 echo sha $SHA >> REF-INFO
