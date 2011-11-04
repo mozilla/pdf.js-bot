@@ -63,11 +63,13 @@ function setupServer(callback){
   // POST /newmerge handler
   app.post('/newmerge', function(req, res){
     var payload = JSON.parse(req.body.payload);
+    console.log((new Date())+': received POST /newmerge');
 
     if (payload.ref !== 'refs/heads/master')
       return;      
     
     queue.push(function(){      
+      console.log((new Date())+': processing POST /newmerge');
       runScript(
         {
           script: 'web',
@@ -79,6 +81,7 @@ function setupServer(callback){
           timeout: config.process_timeout_mins*60*1000,
         }, 
         function(output){
+          console.log((new Date())+': done POST /newmerge');
           queue.next();
         }
       );
