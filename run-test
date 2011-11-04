@@ -59,6 +59,15 @@ fi
 
 
 #
+# Garbage collector
+#
+echo
+echo "========== Running garbage collector in $TMP_DIR"
+cd $SCRIPT_DIR
+./run-gc $TMP_DIR
+
+
+#
 # Fetch git repo to be tested (target), checkout desired sha
 #
 echo

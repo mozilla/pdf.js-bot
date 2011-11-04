@@ -20,6 +20,7 @@ TMP_DIR=$5
 # Make sure there are no stray processes running
 #
 if [ -z "$PDFJSBOT_STAGING" ]; then
+  echo
   echo "========== Killing any stray processes"  
   ps ax -o "pid command" | grep -v 'grep' | grep -E -i 'test.py' | sed -E 's/([0-9]+) .+/\1/g' | xargs kill -TERM 1>/dev/null 2>/dev/null
   ps ax -o "pid comm" | grep -E -i 'firefox' | sed -E 's/([0-9]+) .+/\1/g' | xargs kill -9 1>/dev/null 2>/dev/null
@@ -56,6 +57,15 @@ TARGET_DIR=$TMP_DIR/tests/$SHA
 if [ -d $TARGET_DIR ]; then
   rm -rf $TARGET_DIR
 fi
+
+
+#
+# Garbage collector
+#
+echo
+echo "========== Running garbage collector in $TMP_DIR"
+cd $SCRIPT_DIR
+./run-gc $TMP_DIR
 
 
 #
