@@ -51,7 +51,7 @@ setupServer(function(){
 });
 
 //
-// Set up server config, etc
+// Set up server, etc
 //
 function setupServer(callback){
   // HTTP server
@@ -59,6 +59,31 @@ function setupServer(callback){
   app.use(app.router);
   app.use(express.static(__dirname+'/'+config.tmp_path));
   app.listen(config.server_port);
+
+  // POST /newmerge handler
+  app.post('/newmerge', function(req, res){
+    var payload = JSON.parse(req.body.payload);
+
+    if (payload.ref !== 'refs/heads/master')
+      return;      
+    
+    queue.push(function(){      
+      runScript(
+        {
+          script: 'web',
+          main_url: 'git://github.com/'+config.main_repo+'.git',
+          pull_url: '',
+          pull_sha: '',
+          ref_url: '',
+          tmp_path: '',
+          timeout: config.process_timeout_mins*60*1000,
+        }, 
+        function(output){
+          queue.next();
+        }
+      );
+    }); // queue push
+  }); // POST /newmerge
 
   getPublicIP(function(){
     config.server_url = 'http://'+config.server_host+':'+config.server_port;
@@ -225,11 +250,11 @@ function processNewCommands(){
 //
 function runScript(args, callback){
   var child,
-      outputFile = args.tmp_path+'/'+args.output_file,
+      outputFile = args.output_file ? args.tmp_path+'/'+args.output_file : undefined,
       script = './run-'+args.script,
       cmd = 'mkdir -p '+args.tmp_path+'; '+
-            script+' '+args.main_url+' '+args.pull_url+' '+args.pull_sha+' '+args.ref_url+' '+args.tmp_path+
-            ' 2>&1 | tee '+outputFile;
+            script+' '+args.main_url+' '+args.pull_url+' '+args.pull_sha+' '+args.ref_url+' '+args.tmp_path+' 2>&1'+
+            (outputFile ? ' | tee '+outputFile : '');
 
   console.log((new Date())+': running: '+cmd); 
 

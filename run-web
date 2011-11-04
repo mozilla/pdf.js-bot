@@ -1,0 +1,30 @@
+#!/bin/bash
+#
+# Clone source repo, generate extension + web site, push to gh-pages
+#
+
+if [ $# -ne 1 ]; then
+  echo 'arguments: <main_repo_url>'
+  echo
+  exit
+fi
+MAIN_URL=$1
+# DO NOT USE LOCAL TMP_DIR=./tmp ... 
+# otherwise 'git push' below will push to bot repo too
+TMP_DIR=/tmp
+
+#
+# Pull main repo
+#
+rm -rf $TMP_DIR/web
+cd $TMP_DIR
+git clone $MAIN_URL web
+
+#
+# Generate extension + web page, then push
+#
+cd $TMP_DIR/web
+make web
+cd build/gh-pages
+git commit -am 'Auto-updating via bot'
+git push origin gh-pages
