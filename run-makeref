@@ -181,7 +181,7 @@ rm -rf $TARGET_DIR/test/ref 1>/dev/null 2>/dev/null
 # Copy existing PDFs *from* local cache
 #
 cd $TARGET_DIR
-cp -n /tmp/pdf-cache/* test/pdfs
+cp -n $TMP_DIR/pdf-cache/* test/pdfs
 
 
 #
@@ -214,8 +214,8 @@ kill -9 $XVFB_PID 1>/dev/null 2>/dev/null
 # Copy new PDFs *to* local cache
 #
 cd $TARGET_DIR
-mkdir -p /tmp/pdf-cache
-cp -n test/pdfs/*.pdf /tmp/pdf-cache
+mkdir -p $TMP_DIR/pdf-cache
+cp -n test/pdfs/*.pdf $TMP_DIR/pdf-cache
 
 
 if [ ! -d $TARGET_DIR/test/ref ]; then
