@@ -72,7 +72,7 @@ And cross your fingers :)
 The instructions below assume we'll be deploying on **Ubuntu 11.04**. See http://alestic.com/ for a list of EC2 images.
 
 1. `$ sudo apt-get update`
-1. Install via apt-get: `make`, `g++`
+1. Install via apt-get: `make`, `g++`, `zip`
 
 **Browser, Xvfb**
 
