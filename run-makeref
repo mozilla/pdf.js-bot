@@ -93,22 +93,6 @@ if [ $? != 0 ]; then
 fi
 
 
-#
-# Run linter - MUST COME BEFORE OVERWRITING ANY FILES!
-#
-echo
-echo "========== Running 'make lint'"
-cd $TARGET_DIR
-make lint &
-wait $!
-if [ $? != 0 ]; then
-  echo
-  echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-  echo "ERROR: Lint didn't pass."
-  echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"  
-  exit
-fi
-
 
 #
 # Merge upstream into pull request
@@ -122,6 +106,23 @@ if [ $? != 0 ]; then
   echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
   echo "ERROR: Could not merge upstream into pull request. Please resolve conflicts."
   echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+  exit
+fi
+
+
+#
+# Run linter
+#
+echo
+echo "========== Running 'make lint'"
+cd $TARGET_DIR
+make lint &
+wait $!
+if [ $? != 0 ]; then
+  echo
+  echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+  echo "ERROR: Lint didn't pass."
+  echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"  
   exit
 fi
 

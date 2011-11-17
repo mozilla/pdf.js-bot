@@ -93,16 +93,6 @@ fi
 
 
 #
-# Run linter - MUST COME BEFORE OVERWRITING ANY FILES!
-#
-echo
-echo "========== Running 'make lint'"
-cd $TARGET_DIR
-make lint &
-wait $! # so we can trap SIGTERM, see above
-
-
-#
 # Merge upstream into pull request
 #
 echo
@@ -116,6 +106,16 @@ if [ $? != 0 ]; then
   echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
   exit
 fi
+
+
+#
+# Run linter
+#
+echo
+echo "========== Running 'make lint'"
+cd $TARGET_DIR
+make lint &
+wait $! # so we can trap SIGTERM, see above
 
 
 #
