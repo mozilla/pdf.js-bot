@@ -178,7 +178,8 @@ cp -f $SCRIPT_DIR/test-files/browser_manifest.json ./test/resources/browser_mani
 # prepare Xvfb
 Xvfb :1 1>/dev/null 2>/dev/null &
 XVFB_PID=$!
-# make bot_test
+export DISPLAY=:1
+# bot_test
 make bot_test &
 wait $! # so we can trap SIGTERM, see above
 # kill Xvfb

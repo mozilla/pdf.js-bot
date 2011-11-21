@@ -198,6 +198,8 @@ cp -f $SCRIPT_DIR/test-files/browser_manifest.json ./test/resources/browser_mani
 # prepare Xvfb
 Xvfb :1 1>/dev/null 2>/dev/null &
 XVFB_PID=$!
+export DISPLAY=:1
+# bot_master
 make bot_master &
 wait $!
 if [ $? != 0 ]; then
