@@ -159,13 +159,6 @@ fi
 
 
 #
-# Copy existing PDFs *from* local cache
-#
-cd $TARGET_DIR
-cp -n $TMP_DIR/pdf-cache/* test/pdfs
-
-
-#
 # Deploy missing test/ files, run tests
 #
 echo
@@ -185,14 +178,6 @@ make bot_test &
 wait $! # so we can trap SIGTERM, see above
 # kill Xvfb
 kill -9 $XVFB_PID 1>/dev/null 2>/dev/null
-
-
-#
-# Copy new PDFs *to* local cache
-#
-cd $TARGET_DIR
-mkdir -p $TMP_DIR/pdf-cache
-cp -n test/pdfs/*.pdf $TMP_DIR/pdf-cache
 
 
 #
