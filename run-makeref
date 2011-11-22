@@ -197,7 +197,7 @@ cp -f $SCRIPT_DIR/test-files/local.mk . 2>/dev/null
 cp -f $SCRIPT_DIR/test-files/browser_manifest.json ./test/resources/browser_manifests 2>/dev/null
 # prepare Xvfb
 killall -9 Xvfb
-Xvfb :1 1>/dev/null 2>/dev/null &
+Xvfb :1 -screen 0 1280x1024x24 1>/dev/null 2>/dev/null &
 XVFB_PID=$!
 export DISPLAY=:1
 # bot_master
