@@ -128,57 +128,6 @@ fi
 
 
 #
-# Pull previous reference snapshots (for sanity check, see below)
-#
-echo
-echo "========== Cloning previous reference images into test/ref/"
-mkdir -p $TARGET_DIR/test/ref
-cd $TARGET_DIR/test/ref
-git init; git pull -f --quiet $REF_URL
-if [ $? != 0 ]; then
-  echo
-  echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-  echo "ERROR: Something went wrong."
-  echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"  
-  exit
-fi
-
-
-#
-# Check if commit/SHA used to generate previous snapshots is present in history
-#
-echo
-echo "========== Checking for consistency with reference repo"
-cd $TARGET_DIR/test/ref
-if [ -f REF-INFO ]; then
-  ORIGINAL_SHA=`grep 'sha' REF-INFO | sed -e 's/sha \([0-9a-z]*\)/\1/g'` # get SHA from REF-INFO
-  COMMIT_EXISTS=`cd $TARGET_DIR; git log --format="%H" | grep $ORIGINAL_SHA` # ask git if SHA exists in index
-  if [ -z "$COMMIT_EXISTS" ]; then # is COMMIT_EXISTS zero-length? (i.e. no match)
-    echo
-    echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-    echo "ERROR: Could not find commit used to generate the *previous* reference images"
-    echo "       in history."
-    echo "       Generating a new set from here can thus cause an unintended regression."
-    echo
-    echo "       Please merge the missing pull request into upstream and try again."
-    echo
-    echo "Commit used to create snapshots (REF-INFO file from reference repo):"
-    cat $TARGET_DIR/test/ref/REF-INFO
-    echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-    exit
-  fi
-else
-  echo "Previous reference repo was EMPTY. Moving on..."
-fi
-
-
-#
-# We don't need the previous reference snapshots anymore
-#
-rm -rf $TARGET_DIR/test/ref 1>/dev/null 2>/dev/null
-
-
-#
 # Copy existing PDFs *from* local cache
 #
 cd $TARGET_DIR
