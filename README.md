@@ -78,10 +78,6 @@ The instructions below assume we'll be deploying on **Ubuntu 11.04**. See http:/
 
 1. Install via apt-get: `firefox`, `xvfb` (necessary as we will run browsers without a display); and fonts `xfonts-100dpi`, `xfonts-75dpi`, `xfonts-scalable`, and `xfonts-cyrillic`.
 1. Test `xvfb` via `$ xvfb-run firefox`. Firefox shouldn't bail out with a no-display message.
-1. Configure `xvfb` by appending to `/etc/profile`:
-
-        /usr/bin/Xvfb :1 1>/dev/null 2>/dev/null &
-        export DISPLAY=:1
 
 **Git, Github**
 
