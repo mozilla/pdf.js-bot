@@ -162,14 +162,14 @@ function processNewCommands(){
                   msg = '**All tests passed.**';
                 }
                 else {
-                  msg = '**All tests passed,** but with **WARNING(s)**.';
+                  msg = '# WARNING(s) found';
+                  msg += '\n\n**All tests passed,** but with **WARNING(s)**.';
                   msg += '\n\nMake sure to _read them!_ :).';
                 }
               }
               // Tests DID NOT pass
               else {
-
-                msg = '**ERROR(s) found**';
+                msg = '# ERROR(s) found';
 
                 if (path.existsSync(config.tmp_path+'/tests/'+cmd.pull_sha+'/eq.log')) {                  
                   var url = config.server_url+'/tests/'+cmd.pull_sha+'/reftest-analyzer.xhtml'+
