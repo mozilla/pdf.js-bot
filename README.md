@@ -114,6 +114,8 @@ The instructions below assume we'll be deploying on **Ubuntu 11.04**. See http:/
         $ echo nothing yet > README
         $ git add .; git commit -am 'First'
 
+1. Configure startup cron job with `$ crontab -e` to run `./update` script.
+
 **Launch: Production**
 
 1. Check if default parameters are OK: `config.json`
