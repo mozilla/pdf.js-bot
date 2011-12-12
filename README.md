@@ -116,7 +116,7 @@ The instructions below assume we'll be deploying on **Ubuntu 11.04**. See http:/
 
 1. Configure startup cron job with `$ sudo crontab -e` to run `./update` script:
 
-        @reboot . /etc/profile; cd /home/ubuntu/pdf.js-bot; ./update
+        @reboot . /etc/environment; . /etc/profile; cd /home/ubuntu/pdf.js-bot; ./update
 
 **Launch: Production**
 
