@@ -77,6 +77,7 @@ The instructions below assume we'll be deploying on **Ubuntu 11.04**. See http:/
 **Browser, Xvfb**
 
 1. Install via apt-get: `firefox`, `xvfb` (necessary as we will run browsers without a display); and fonts `xfonts-100dpi`, `xfonts-75dpi`, `xfonts-scalable`, and `xfonts-cyrillic`.
+1. Chrome can be installed by downloading the `.deb` package from their page (http://www.chromium.org/getting-involved/dev-channel), and running `sudo dpkg -i google-chrome.deb` followed by `sudo apt-get -f install` to resolve missing dependencies.
 1. Test `xvfb` via `$ xvfb-run firefox`. Firefox shouldn't bail out with a no-display message.
 
 **Git, Github**
