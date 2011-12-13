@@ -114,7 +114,9 @@ The instructions below assume we'll be deploying on **Ubuntu 11.04**. See http:/
         $ echo nothing yet > README
         $ git add .; git commit -am 'First'
 
-1. Configure startup cron job with `$ crontab -e` to run `./update` script.
+1. Configure startup cron job with `$ sudo crontab -e` to run `./update` script:
+
+        @reboot . /etc/environment; . /etc/profile; cd /home/ubuntu/pdf.js-bot; ./update
 
 **Launch: Production**
 
