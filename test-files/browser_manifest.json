@@ -1,6 +1,10 @@
 [
    {
-    "name":"firefox",
+    "name":"Firefox (8.0)",
     "path":"/home/ubuntu/firefox/8.0/firefox"
+   },
+   {
+    "name":"Chrome (Dev)",
+    "path":"/usr/bin/google-chrome"
    }
 ]
