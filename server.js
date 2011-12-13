@@ -151,7 +151,6 @@ function processNewCommands(){
             }, 
             function(output){
               var msg = '';
-              output = output.replace(/^.*TEST-PASS.*\n$/mg, "");
               output = '\n'+output; // hack to get first line into code below
               output = output.replace(/\n/g, '\n    '); // reformat output as Github/Markdown code
               
@@ -205,7 +204,6 @@ function processNewCommands(){
             }, 
             function(output){
               var msg = '';
-              output = output.replace(/^.*TEST-PASS.*\n$/mg, "");
               output = '\n'+output; // hack to get first line into code below
               output = output.replace(/\n/g, '\n    '); // reformat output as Github/Markdown code
               
