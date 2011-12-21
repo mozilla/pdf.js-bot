@@ -203,7 +203,11 @@ if [ $? != 0 ]; then
   echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
   exit
 fi
-
+if [ -d $REF_URL ]; then
+  echo "Running garbage collector in local git repo"
+  cd $REF_URL
+  git gc
+fi
 
 #
 # Erase everything
