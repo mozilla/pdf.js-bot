@@ -1,0 +1,121 @@
+#!/bin/bash
+#
+# Clone source repo to be tested and run tests
+#
+
+SCRIPT_PID=$$
+
+if [ $# -ne 5 ]; then
+  echo 'arguments: <main_repo_url> <requester_repo_url> <sha_pull_req> <ref_repo_url> <temp_path>'
+  echo
+  exit
+fi
+MAIN_URL=$1
+TARGET_URL=$2
+SHA=$3
+REF_URL=$4
+TMP_DIR=$5
+
+#
+# Make sure there are no stray processes running
+#
+if [ -z "$PDFJSBOT_STAGING" ]; then
+  echo "========== Killing any stray processes"
+  ps ax -o "pid command" | grep -v 'grep' | grep -E -i 'test.py' | sed -E 's/([0-9]+) .+/\1/g' | xargs kill -TERM 1>/dev/null 2>/dev/null
+  ps ax -o "pid comm" | grep -E -i 'firefox' | sed -E 's/([0-9]+) .+/\1/g' | xargs kill -9 1>/dev/null 2>/dev/null
+fi
+
+#
+# killtree(): Kills all descendant child processes
+#
+killtree() {
+    local _pid=$1
+    local _regex="[ ]*([0-9]+)[ ]+${_pid}"
+    for _child in $(/bin/ps ax -o "pid= ppid=" | grep -E "${_regex}" | sed -E "s/${_regex}/\1/g"); do
+        killtree ${_child}
+    done
+    kill -KILL ${_pid} 1>/dev/null 2>/dev/null
+}
+
+#
+# Run killtree() upon signal
+# NB: trap only works during "wait" or after a command is done
+trap "killtree $SCRIPT_PID" SIGTERM SIGINT
+
+
+#
+# Set up vars
+#
+# Get absolute path for current dir
+SCRIPT_DIR="$( cd "$( dirname "$0" )" && pwd )"
+# Hack to get absolute path for tmp path
+mkdir -p $TMP_DIR; cd $TMP_DIR
+TMP_DIR="$( cd "$( dirname "$0" )" && pwd )"
+TARGET_DIR=$TMP_DIR/tests/$SHA
+
+if [ -d $TARGET_DIR ]; then
+  rm -rf $TARGET_DIR
+fi
+
+
+#
+# Garbage collector
+#
+echo
+echo "========== Running garbage collector in $TMP_DIR"
+cd $SCRIPT_DIR
+./run-gc $TMP_DIR
+
+
+#
+# Fetch git repo to be tested (target), checkout desired sha
+#
+echo
+echo "========== Cloning pull request repo"
+mkdir -p $TARGET_DIR
+cd $TARGET_DIR
+git clone $TARGET_URL .
+if [ $? != 0 ]; then
+  echo
+  echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+  echo "ERROR: Could not clone $TARGET_URL"
+  echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+  exit
+fi
+git checkout --quiet $SHA
+if [ $? != 0 ]; then
+  echo
+  echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+  echo "ERROR: Could not checkout sha $SHA"
+  echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+  exit
+fi
+
+
+#
+# Merge upstream into pull request
+#
+echo
+echo "========== Merging upstream into pull request clone"
+cd $TARGET_DIR
+git pull --quiet $MAIN_URL master
+if [ $? != 0 ]; then
+  echo
+  echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+  echo "ERROR: Could not merge upstream into pull request. Please resolve conflicts."
+  echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+  exit
+fi
+
+
+#
+# Run linter
+#
+echo
+echo "========== Running 'make lint'"
+cd $TARGET_DIR
+make lint &
+wait $! # so we can trap SIGTERM, see above
+
+echo
+echo "All done."

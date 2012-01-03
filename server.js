@@ -178,15 +178,62 @@ function processNewCommands(){
                 }
               } // if !tests passed
 
-              msg += '\n\nOutput:\n\n'+output              
+              msg += '\n\nOutput:\n\n'+output;
               github.postEndMessage(cmd, (new Date())-t1, msg);
               console.log((new Date())+': done processing command "'+cmd.command+'" in Pull #'+cmd.pull_number+' from @'+cmd.user+' (id:'+cmd.id+')');
             
               queue.next();
             }
-          ); // runTest()
+          ); // test
           break;
   
+        //
+        // Process 'lint' command
+        //      
+        case 'lint':
+          runScript(
+            {
+              script: cmd.command,
+              main_url: 'git://github.com/'+config.main_repo+'.git',
+              pull_url: cmd.pull_url,
+              pull_sha: cmd.pull_sha,
+              ref_url: config.ref_repo,
+              tmp_path: config.tmp_path,
+              timeout: config.process_timeout_mins*60*1000,
+              output_file: liveOutputFile
+            }, 
+            function(output){
+              var msg = '';
+              output = '\n'+output; // hack to get first line into code below
+              output = output.replace(/\n/g, '\n    '); // reformat output as Github/Markdown code
+              
+              // Tests passed?
+              if (output.search("All tests passed") > -1 && // 'make test'
+                  output.search("files checked, no errors found") > -1) { // 'make lint'
+                                  
+                if (output.search("WARNING") < 0) {
+                  msg = '**All tests passed.**';
+                }
+                else {
+                  msg = '# WARNING(s) found';
+                  msg += '\n\n**All tests passed,** but with **WARNING(s)**.';
+                  msg += '\n\nMake sure to _read them!_ :).';
+                }
+              }
+              // Tests DID NOT pass
+              else {
+                msg = '# ERROR(s) found';
+              } // if !lint passed
+
+              msg += '\n\nOutput:\n\n'+output;
+              github.postEndMessage(cmd, (new Date())-t1, msg);
+              console.log((new Date())+': done processing command "'+cmd.command+'" in Pull #'+cmd.pull_number+' from @'+cmd.user+' (id:'+cmd.id+')');
+            
+              queue.next();
+            }
+          ); // lint
+          break;
+
         //
         // Process 'makeref' command
         //      
@@ -224,13 +271,13 @@ function processNewCommands(){
 
               }; // if tests !passed
 
-              msg += '\n\nOutput:\n\n'+output
+              msg += '\n\nOutput:\n\n'+output;
               github.postEndMessage(cmd, (new Date())-t1, msg);
               console.log((new Date())+': done processing command "'+cmd.command+'" in Pull #'+cmd.pull_number+' from @'+cmd.user+' (id:'+cmd.id+')');
 
               queue.next();
             }
-          ); // runMakeref()
+          ); // makeref
           break;
   
         //
