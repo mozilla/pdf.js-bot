@@ -208,9 +208,7 @@ function processNewCommands(){
               output = output.replace(/\n/g, '\n    '); // reformat output as Github/Markdown code
               
               // Tests passed?
-              if (output.search("All tests passed") > -1 && // 'make test'
-                  output.search("files checked, no errors found") > -1) { // 'make lint'
-                                  
+              if (output.search("files checked, no errors found") > -1) { // 'make lint'                                  
                 if (output.search("WARNING") < 0) {
                   msg = '**All tests passed.**';
                 }
