@@ -13,6 +13,8 @@ Note that the bot only listens for commands from repo collaborators (auto-whitel
 
 + `@pdfjsbot test` : This will run the full suite of tests on the PR, including image comparison tests against the reference repo. In case there are any image differences, a URL/link will be provided in a comment to the pull request to allow reviewers and requesters to inspect the images and their differences.
 
++ `@pdfjsbot lint` : Runs just the JavaScript linter.
+
 + `@pdfjsbot makeref` : This will generate reference images using the pull request source code and push the resulting images to the reference repo. Note that THIS WILL OVERWRITE any existing images, so only do this if you definitely approve all the visual changes introduced in the PR.
 
 
