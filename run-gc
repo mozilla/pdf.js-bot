@@ -13,6 +13,6 @@ TMP_DIR=$1
 
 echo "Collecting garbage..."
 
-# Delete all sub-dirs older than 15 days
-find $TMP_DIR/tests -mindepth 1 -maxdepth 1 -type d -mtime +15 | xargs rm -rf
-find $TMP_DIR/refs -mindepth 1 -maxdepth 1 -type d -mtime +15 | xargs rm -rf
+# Delete all sub-dirs older than 90 days
+find $TMP_DIR/tests -mindepth 1 -maxdepth 1 -type d -mtime +90 | xargs rm -rf
+find $TMP_DIR/refs -mindepth 1 -maxdepth 1 -type d -mtime +90 | xargs rm -rf
