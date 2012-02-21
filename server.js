@@ -57,7 +57,7 @@ function setupServer(callback){
   // HTTP server
   app.use(express.bodyParser());
   app.use(app.router);
-  app.use(express.static(__dirname+'/'+config.tmp_path));
+  app.use(express.static(config.tmp_path));
   app.listen(config.server_port);
 
   // POST /newmerge handler
