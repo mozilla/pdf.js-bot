@@ -3,7 +3,7 @@
 # Clone source repo, generate extension + web site, push to gh-pages
 #
 
-if [ $# -ne 1 ]; then
+if [ $# -ne 2 ]; then
   echo 'arguments: <main_repo_url> <tmp_dir>'
   echo
   exit
