@@ -65,8 +65,10 @@ function setupServer(callback){
     var payload = JSON.parse(req.body.payload);
     console.log((new Date())+': received POST /newmerge');
 
-    if (payload.ref !== 'refs/heads/master')
-      return;      
+    if (payload.ref !== 'refs/heads/master') {
+      console.log((new Date())+': /newmerge not on master branch. skipping update of gh-pages');
+      return;
+    }
     
     queue.push(function(){      
       console.log((new Date())+': processing POST /newmerge');
@@ -77,7 +79,7 @@ function setupServer(callback){
           pull_url: '',
           pull_sha: '',
           ref_url: '',
-          tmp_path: '',
+          tmp_path: config.tmp_path,
           timeout: config.process_timeout_mins*60*1000,
         }, 
         function(output){
